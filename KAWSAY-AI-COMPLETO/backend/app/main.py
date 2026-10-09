@@ -8,6 +8,8 @@ from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.core.database import check_database_connection
 from app.api import api
+from app.modules.auth.routes import router as auth_router
+from app.modules.sync.routes import router as sync_router
 logging.basicConfig(
     level=getattr(logging, settings.log_level.upper(), logging.INFO),
     format="%(asctime)s %(levelname)s %(name)s request_id=%(request_id)s %(message)s",
@@ -57,4 +59,6 @@ def readiness():
     payload = {"status": "ready" if database_ok else "not_ready", "database": "ok" if database_ok else "unavailable"}
     return JSONResponse(status_code=200 if database_ok else 503, content=payload)
 
+app.include_router(auth_router, prefix="/api/v1")
+app.include_router(sync_router, prefix="/api/v1")
 app.include_router(api)

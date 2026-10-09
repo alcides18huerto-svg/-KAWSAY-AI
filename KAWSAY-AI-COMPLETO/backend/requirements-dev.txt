@@ -1,0 +1,4 @@
+# Herramientas de calidad de codigo (solo desarrollo).
+#   Uso: python -m pip install -r requirements-dev.txt
+black==24.10.0
+ruff==0.8.4

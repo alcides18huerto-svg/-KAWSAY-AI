@@ -2,31 +2,12 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import select, func
 from app.core.database import get_db
-from app.core.security import hash_password, verify_password, create_access_token, get_current_user, require_roles
+from app.core.security import get_current_user, require_roles
 from app.models import *
 from app.schemas import *
 from app.ai import adapt_assignment, tutor_reply
 
 api = APIRouter(prefix="/api/v1")
-
-@api.post("/auth/register")
-def register(payload: RegisterRequest, db: Session = Depends(get_db)):
-    if payload.role not in {"STUDENT","TEACHER","ADMIN"}:
-        raise HTTPException(400, "Rol inválido")
-    if db.scalar(select(User).where(User.email == payload.email)):
-        raise HTTPException(409, "El correo ya existe")
-    user = User(email=payload.email, password_hash=hash_password(payload.password),
-                role=payload.role, full_name=payload.full_name)
-    db.add(user); db.commit(); db.refresh(user)
-    return {"id": user.id, "email": user.email, "role": user.role, "full_name": user.full_name}
-
-@api.post("/auth/login")
-def login(payload: LoginRequest, db: Session = Depends(get_db)):
-    user = db.scalar(select(User).where(User.email == payload.email))
-    if not user or not verify_password(payload.password, user.password_hash):
-        raise HTTPException(401, "Credenciales incorrectas")
-    return {"access_token": create_access_token(user.id, user.role), "token_type": "bearer",
-            "user": {"id": user.id, "full_name": user.full_name, "role": user.role}}
 
 @api.get("/students/me")
 def student_me(user=Depends(require_roles("STUDENT")), db: Session = Depends(get_db)):
@@ -287,17 +268,6 @@ def create_attempt(payload:AttemptCreate,user=Depends(require_roles("STUDENT")),
     progress.mastery_level = round(progress.correct_attempts / progress.total_attempts * 100, 2)
     db.commit()
     return {"status":"synced","id":payload.id}
-
-@api.post("/sync/push")
-def sync_push(items:list[AttemptCreate],user=Depends(require_roles("STUDENT")),db:Session=Depends(get_db)):
-    synced=[]; duplicates=[]
-    for payload in items:
-        if db.get(LearningAttempt,payload.id):
-            duplicates.append(payload.id); continue
-        db.add(LearningAttempt(student_id=user.id,**payload.model_dump()))
-        synced.append(payload.id)
-    db.commit()
-    return {"synced":synced,"duplicates":duplicates}
 
 @api.get("/progress/me")
 def my_progress(user=Depends(require_roles("STUDENT")),db:Session=Depends(get_db)):

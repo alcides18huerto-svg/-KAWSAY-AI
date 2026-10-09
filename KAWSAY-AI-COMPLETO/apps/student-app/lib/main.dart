@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'core/api/api_client.dart';
 import 'core/database/local_database.dart';
+import 'core/sync/sync_engine.dart';
 import 'features/auth/login_page.dart';
 import 'features/home/home_page.dart';
 import 'features/progress/progress_page.dart';
@@ -10,6 +11,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LocalDatabase.database;
   await ApiClient.instance.init();
+  SyncEngine.instance.start();
   runApp(const KawsayApp());
 }
 

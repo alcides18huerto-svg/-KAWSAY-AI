@@ -145,8 +145,15 @@ class ApiClient {
       await _send('GET', '/progress/me') as List<dynamic>;
 
   // -------------------------------------------------------------- Offline
-  Future<Map<String, dynamic>> pushAttempts(List<Map<String, dynamic>> items) async {
-    return await _send('POST', '/sync/push', body: items) as Map<String, dynamic>;
+  /// Envía un lote idempotente de eventos (máximo 50) al motor de sync.
+  Future<Map<String, dynamic>> pushSyncBatch({
+    required String clientBatchId,
+    required List<Map<String, dynamic>> events,
+  }) async {
+    return await _send('POST', '/sync/push', body: {
+      'client_batch_id': clientBatchId,
+      'events': events,
+    }) as Map<String, dynamic>;
   }
 
   Future<Map<String, dynamic>> syncAttempt(Map<String, dynamic> attempt) async {

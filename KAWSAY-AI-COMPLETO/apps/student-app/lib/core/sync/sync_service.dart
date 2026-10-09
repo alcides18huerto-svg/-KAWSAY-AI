@@ -3,12 +3,14 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:uuid/uuid.dart';
 import '../api/api_client.dart';
 import '../database/local_database.dart';
+import 'sync_engine.dart';
 
 /// Servicio de sincronización offline-first.
 ///
 /// - Guarda los intentos localmente aunque no haya red.
 /// - Los encola en `sync_queue` y los envía al backend cuando hay conexión.
-/// - El backend es idempotente por `id`, así que reenviar no duplica datos.
+/// - El backend es idempotente por `client_event_id`, así que reenviar no
+///   duplica datos.
 class SyncService {
   SyncService._();
   static final SyncService instance = SyncService._();
@@ -16,8 +18,7 @@ class SyncService {
   final _uuid = const Uuid();
   final _api = ApiClient.instance;
 
-  bool _syncing = false;
-  bool get isSyncing => _syncing;
+  bool get isSyncing => SyncEngine.instance.isFlushing;
 
   /// Registra un intento de respuesta del estudiante.
   ///
@@ -88,48 +89,12 @@ class SyncService {
         where: 'id = ?', whereArgs: [id]);
   }
 
-  /// Envía todos los eventos pendientes de la cola local.
+  /// Vacía la cola local delegando en [SyncEngine] (lotes de máximo 50).
   ///
   /// Se llama al iniciar sesión, al recuperar conexión o manualmente.
   Future<({int synced, int pending})> flushQueue() async {
-    final db = await LocalDatabase.database;
-    final pending = await db.query('sync_queue', where: 'status = ?', whereArgs: ['pending']);
-    if (pending.isEmpty) return (synced: 0, pending: 0);
-
-    if (!_api.isAuthenticated || !await _hasConnection()) {
-      return (synced: 0, pending: pending.length);
-    }
-
-    _syncing = true;
-    var synced = 0;
-    try {
-      final attempts = pending
-          .map((row) => jsonDecode(row['payload'] as String) as Map<String, dynamic>)
-          .toList();
-      final result = await _api.pushAttempts(attempts);
-      final confirmed = (result['synced'] as List<dynamic>? ?? []).cast<String>();
-      final duplicates = (result['duplicates'] as List<dynamic>? ?? []).cast<String>();
-      final resolved = {...confirmed, ...duplicates};
-
-      for (final row in pending) {
-        final eventId = row['event_id'] as String;
-        // El backend confirma tanto sincronizados como duplicados;
-        // en ambos casos el evento ya no debe reintentarse.
-        if (!resolved.contains(eventId)) continue;
-        await db.update('sync_queue', {'status': 'done'},
-            where: 'event_id = ?', whereArgs: [eventId]);
-        await _markAttemptSynced(eventId);
-        synced++;
-      }
-    } catch (_) {
-      // Se mantiene pendiente para el próximo intento.
-    } finally {
-      _syncing = false;
-    }
-
-    final remaining = await db.query('sync_queue',
-        where: 'status = ?', whereArgs: ['pending']);
-    return (synced: synced, pending: remaining.length);
+    final result = await SyncEngine.instance.flush();
+    return (synced: result.synced, pending: result.pending);
   }
 
   Future<int> pendingCount() async {
@@ -140,7 +105,7 @@ class SyncService {
   }
 
   Future<bool> _hasConnection() async {
-    final result = await Connectivity().checkConnectivity();
-    return result != ConnectivityResult.none;
+    final results = await Connectivity().checkConnectivity();
+    return results.any((result) => result != ConnectivityResult.none);
   }
 }

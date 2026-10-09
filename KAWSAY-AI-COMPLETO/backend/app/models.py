@@ -1,51 +1,50 @@
+"""Aggregated ORM models.
+
+Core entities are defined in their feature modules (``app.modules.*``) and
+re-exported here so existing imports (``from app.models import User``) keep
+working while a single ``Base.metadata`` is shared with Alembic.
+"""
 import uuid
 from datetime import datetime
-from sqlalchemy import String, Integer, Boolean, DateTime, ForeignKey, Text, Float, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
+from sqlalchemy.orm import Mapped, mapped_column
+
 from app.core.database import Base
+from app.modules.classrooms.models import Classroom, ClassroomStudent
+from app.modules.users.models import School, StudentProfile, TeacherProfile, User
+
+__all__ = [
+    "User",
+    "StudentProfile",
+    "TeacherProfile",
+    "School",
+    "Classroom",
+    "ClassroomStudent",
+    "Subject",
+    "Competency",
+    "Assignment",
+    "AssignmentGrade",
+    "AssignmentVariant",
+    "LearningAttempt",
+    "StudentProgress",
+    "SupportFlag",
+    "TeacherIntervention",
+]
+
 
 def uid():
     return str(uuid.uuid4())
 
-class User(Base):
-    __tablename__ = "users"
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
-    email: Mapped[str] = mapped_column(String(255), unique=True, index=True)
-    password_hash: Mapped[str] = mapped_column(String(255))
-    role: Mapped[str] = mapped_column(String(20), index=True)
-    full_name: Mapped[str] = mapped_column(String(180))
-    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
-
-class School(Base):
-    __tablename__ = "schools"
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
-    name: Mapped[str] = mapped_column(String(200), index=True)
-    country: Mapped[str] = mapped_column(String(80), default="Perú")
-    region: Mapped[str | None] = mapped_column(String(100), nullable=True)
-    community: Mapped[str | None] = mapped_column(String(120), nullable=True)
-
-class Classroom(Base):
-    __tablename__ = "classrooms"
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
-    school_id: Mapped[str] = mapped_column(ForeignKey("schools.id"), index=True)
-    teacher_id: Mapped[str] = mapped_column(ForeignKey("users.id"), index=True)
-    name: Mapped[str] = mapped_column(String(120))
-    school_year: Mapped[int] = mapped_column(Integer, default=2026)
-
-class StudentProfile(Base):
-    __tablename__ = "student_profiles"
-    user_id: Mapped[str] = mapped_column(ForeignKey("users.id"), primary_key=True)
-    school_id: Mapped[str | None] = mapped_column(ForeignKey("schools.id"), nullable=True)
-    grade: Mapped[int] = mapped_column(Integer)
-    native_language: Mapped[str] = mapped_column(String(80), default="Español")
-    preferred_language: Mapped[str] = mapped_column(String(80), default="Español")
-    interests: Mapped[str | None] = mapped_column(Text, nullable=True)
-
-class ClassroomStudent(Base):
-    __tablename__ = "classroom_students"
-    classroom_id: Mapped[str] = mapped_column(ForeignKey("classrooms.id"), primary_key=True)
-    student_id: Mapped[str] = mapped_column(ForeignKey("users.id"), primary_key=True)
 
 class Subject(Base):
     __tablename__ = "subjects"
@@ -53,11 +52,13 @@ class Subject(Base):
     name: Mapped[str] = mapped_column(String(120), index=True)
     grade: Mapped[int] = mapped_column(Integer, index=True)
 
+
 class Competency(Base):
     __tablename__ = "competencies"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
     subject_id: Mapped[str] = mapped_column(ForeignKey("subjects.id"), index=True)
     name: Mapped[str] = mapped_column(String(255))
+
 
 class Assignment(Base):
     __tablename__ = "assignments"
@@ -70,10 +71,12 @@ class Assignment(Base):
     status: Mapped[str] = mapped_column(String(20), default="DRAFT")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
+
 class AssignmentGrade(Base):
     __tablename__ = "assignment_grades"
     assignment_id: Mapped[str] = mapped_column(ForeignKey("assignments.id"), primary_key=True)
     grade: Mapped[int] = mapped_column(Integer, primary_key=True)
+
 
 class AssignmentVariant(Base):
     __tablename__ = "assignment_variants"
@@ -85,6 +88,7 @@ class AssignmentVariant(Base):
     approval_status: Mapped[str] = mapped_column(String(20), default="PENDING")
     version: Mapped[int] = mapped_column(Integer, default=1)
     __table_args__ = (UniqueConstraint("assignment_id", "grade", "version"),)
+
 
 class LearningAttempt(Base):
     __tablename__ = "learning_attempts"
@@ -98,6 +102,7 @@ class LearningAttempt(Base):
     response_time_seconds: Mapped[float] = mapped_column(Float, default=0)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
+
 class StudentProgress(Base):
     __tablename__ = "student_progress"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
@@ -108,6 +113,7 @@ class StudentProgress(Base):
     correct_attempts: Mapped[int] = mapped_column(Integer, default=0)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
 
+
 class SupportFlag(Base):
     __tablename__ = "support_flags"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
@@ -116,6 +122,7 @@ class SupportFlag(Base):
     evidence: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(String(20), default="OPEN")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
+
 
 class TeacherIntervention(Base):
     __tablename__ = "teacher_interventions"

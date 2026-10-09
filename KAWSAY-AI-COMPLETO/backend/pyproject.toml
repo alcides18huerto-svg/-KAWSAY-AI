@@ -1,0 +1,26 @@
+# ============================================================================
+# Configuracion de calidad de codigo (solo herramientas; no es un build-system).
+#   black  : formateador   -> black .
+#   ruff   : linter        -> ruff check .  /  ruff format .
+# ============================================================================
+
+[tool.black]
+line-length = 100
+target-version = ["py311"]
+include = '\.py$'
+extend-exclude = '''(
+  \.venv/ |
+  migrations/versions/
+)'''
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = ["migrations/versions", ".venv", "build"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B011"]
