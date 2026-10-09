@@ -1,0 +1,38 @@
+*{box-sizing:border-box}body{margin:0;font-family:Inter,system-ui,sans-serif;background:#f4f7f5;color:#18312a}
+button,input,textarea,select{font:inherit}.shell{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+aside{background:#123b32;color:white;padding:28px 20px}aside h2{margin:0 0 4px}.nav{display:block;width:100%;text-align:left;padding:12px;margin-top:8px;border-radius:10px;background:transparent}.nav:hover,.nav.selected{background:#1d5145}
+main{padding:34px;max-width:1300px;width:100%}.grid{display:grid;grid-template-columns:1fr 1fr;gap:22px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px}.metric span{display:block;color:#60756e;font-size:14px}.metric strong{display:block;font-size:34px;margin-top:10px}.list-row{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #e5eeeb;padding:14px 0}.list-row small{display:block;color:#698078;margin-top:4px}.badge{font-size:11px;font-weight:800;padding:6px 9px;border-radius:20px;background:#edf2f0}.badge.published{background:#dff3e7;color:#21613c}.flag{border-left:4px solid #e5a83b;background:#fffaf0;padding:10px 12px;margin:12px 0}.flag p{margin:6px 0 0}.empty-panel{max-width:700px}.empty-panel button{margin-top:12px}
+.card{background:white;border:1px solid #dde7e3;border-radius:18px;padding:24px;box-shadow:0 10px 30px #143c3210}
+label{display:block;font-weight:700;margin:15px 0 7px}input,textarea,select{width:100%;padding:12px;border:1px solid #cad8d3;border-radius:10px}
+button{border:0;background:#1d705b;color:white;padding:12px 16px;border-radius:10px;font-weight:700;cursor:pointer}button:disabled{opacity:.6;cursor:not-allowed}
+.grades{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:18px}.grades button{background:#e9f1ee;color:#21473e}.grades .active{background:#1d705b;color:white}
+.notice{padding:13px 16px;border-radius:10px;margin:0 0 18px;font-weight:600}.error-box{background:#fdecec;color:#8f2929;border:1px solid #f2c5c5}.success-box{background:#e8f6ed;color:#21613c;border:1px solid #bde4c9}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}.secondary{background:#426b61}
+.variant{border:1px solid #dbe6e2;border-radius:12px;padding:15px;margin:12px 0}.variant p{white-space:pre-wrap}.variant span{font-size:12px}
+.center{min-height:100vh;display:grid;place-items:center}.login{width:min(420px,92vw)}.login input{margin:7px 0}.login button{width:100%;margin-top:12px}.error{color:#a33131}.ghost{margin-top:30px;background:#ffffff1a}
+@media(max-width:850px){.shell{grid-template-columns:1fr}aside{display:none}.grid{grid-template-columns:1fr}.metrics{grid-template-columns:repeat(2,1fr)}main{padding:18px}}
+.link-button{display:block;width:100%;margin-top:14px;background:transparent;color:#1d705b}
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:12px 10px;border-bottom:1px solid #e5eeeb;vertical-align:top}
+th{color:#60756e;font-size:12px;text-transform:uppercase;letter-spacing:.04em}
+.small-button{padding:7px 10px;font-size:12px;margin:6px}
+.muted{color:#698078;font-size:13px}
+.subform{border-bottom:1px solid #e5eeeb;padding-bottom:18px;margin-bottom:18px}
+.progress-student{padding:10px 0 18px;border-bottom:1px solid #e5eeeb}
+.progress-student h3 small{display:block;color:#698078;font-weight:400;margin-top:5px}
+.progress-track{display:inline-block;width:90px;height:8px;background:#e6eeeb;border-radius:10px;margin-right:8px;vertical-align:middle}
+.progress-track span{display:block;height:100%;border-radius:10px;background:#1d705b}
+.intervention{padding:14px 0;border-bottom:1px solid #e5eeeb}
+.intervention small{display:block;color:#698078;margin-top:5px}
+.section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px}
+@media(max-width:850px){
+  aside{display:flex;gap:6px;overflow-x:auto;padding:12px;position:sticky;top:0;z-index:2}
+  aside h2,aside>span{display:none}
+  .nav{width:auto;white-space:nowrap;margin:0;padding:10px}
+  aside .ghost{margin:0;white-space:nowrap}
+}
+.dashboard-grid{align-items:start}
+.badge.draft{background:#eef1f7;color:#4d5f8c}
+.badge.review{background:#fdf0dc;color:#8a5a12}
+.badge.approved{background:#dff3e7;color:#21613c}
+.grades{padding:4px 0}

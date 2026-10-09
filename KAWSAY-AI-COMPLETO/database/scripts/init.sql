@@ -1,0 +1,22 @@
+-- =============================================================
+--  KAWSAY AI – Punto de entrada de la base de datos
+--  PostgreSQL 15+
+--
+--  Orden de ejecución recomendado:
+--  1. database/scripts/create_tables.sql  → crea todas las tablas e índices
+--  2. database/seeds/grades/01_subjects.sql        → materias por grado
+--  3. database/seeds/subjects/01_subjects_extra.sql → materias adicionales
+--  4. database/seeds/countries/01_schools.sql       → escuelas de ejemplo
+--  5. database/seeds/curriculum/01_competencies.sql → competencias curriculares
+--  6. database/seeds/languages/01_languages_ref.sql → referencia de idiomas
+--
+--  Ejecución rápida (desde la raíz del proyecto):
+--    psql -U kawsay -d kawsay -f database/scripts/create_tables.sql
+--    psql -U kawsay -d kawsay -f database/seeds/grades/01_subjects.sql
+--    psql -U kawsay -d kawsay -f database/seeds/subjects/01_subjects_extra.sql
+--    psql -U kawsay -d kawsay -f database/seeds/countries/01_schools.sql
+--    psql -U kawsay -d kawsay -f database/seeds/curriculum/01_competencies.sql
+--
+--  En producción: usar migraciones Alembic (backend/migrations/)
+-- =============================================================
+SELECT 'KAWSAY AI database ready ✓' AS message;
