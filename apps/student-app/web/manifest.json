@@ -1,0 +1,12 @@
+{
+  "name": "KAWSAY AI",
+  "short_name": "KAWSAY",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#f4f7f5",
+  "theme_color": "#1D705B",
+  "description": "Aplicación offline-first para estudiantes KAWSAY AI",
+  "orientation": "portrait-primary",
+  "prefer_related_applications": false,
+  "icons": []
+}

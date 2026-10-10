@@ -1,0 +1,39 @@
+# ============================================================================
+# KAWSAY AI Backend — .dockerignore
+# Optimiza el contexto de build (postgres:16 no lo usa; darwin/alpine contenedores).
+# Mantén este archivo alineado con gitignore.
+# ============================================================================
+
+# Python
+.git/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+*.egg-info/
+
+# Entorno / secretos (nunca entran secretos reales a la imagen)
+.env
+.env.*
+!.env.example
+
+# Logs y temporales
+*.log
+*.tmp
+*.bak
+tmp/
+
+# Documentación / pruebas locales (no se copian a la imagen de runtime)
+*.md
+docs/
+tests/
+Dockerfile
+docker-compose.yml
+.dockerignore
+.gitignore
