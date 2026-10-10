@@ -1,15 +1,15 @@
 name: Flutter CI
 on:
   push:
-    paths: ["apps/student-app/**"]
+    paths: ["mobile-app/student-app/**"]
   pull_request:
-    paths: ["apps/student-app/**"]
+    paths: ["mobile-app/student-app/**"]
 jobs:
   test:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: apps/student-app
+        working-directory: mobile-app/student-app
     steps:
       - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2

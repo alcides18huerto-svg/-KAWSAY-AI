@@ -29,10 +29,10 @@ Dependencias de backend ya versionadas en `requirements.txt` (fastapi 0.115.6, s
 | 8000   | Backend API   | `/api/v1/*`                            |
 | 5432   | PostgreSQL 16 | contenedor `kawsay_postgres`           |
 | 5050   | pgAdmin       | opcional (admin@kawsay.local / kawsay) |
-| 5173   | Teacher-Web   | Vite dev server                        |
-| 5174   | Admin-Web     | Vite dev server                        |
+| 5173   | Admin-Web     | Vite dev server                        |
+| 5174   | Teacher-Web   | Vite dev server                        |
 
-> Nota: Teacher-Web/Admin-Web corren en **5173/5174** (Vite, definidos en
+> Nota: Admin-Web/Teacher-Web corren en **5173/5174** (Vite, definidos en
 > `CORS_ORIGINS` del backend), no en 3000. Los scripts validan los puertos reales.
 
 ---
@@ -63,8 +63,8 @@ El script hace, en orden y con verificación: Docker daemon → Python ≥3.11 �
 ```bash
 # 1. Variables de entorno (si setup no las creó)
 cp backend/.env.example backend/.env
-cp apps/teacher-web/.env.example apps/teacher-web/.env
-cp apps/admin-web/.env.example apps/admin-web/.env
+cp frontend-web/teacher-web/.env.example frontend-web/teacher-web/.env
+cp frontend-web/admin-web/.env.example frontend-web/admin-web/.env
 
 # 2. Backend: venv + deps
 python -m venv backend/.venv
@@ -78,11 +78,11 @@ cd backend
 .venv/bin/python -m alembic upgrade head
 
 # 5. Web
-cd apps/teacher-web && npm install
-cd apps/admin-web   && npm install
+cd frontend-web/teacher-web && npm install
+cd frontend-web/admin-web   && npm install
 
 # 6. Mobile
-cd apps/student-app && flutter pub get
+cd mobile-app/student-app && flutter pub get
 ```
 
 ---
@@ -93,9 +93,9 @@ cd apps/student-app && flutter pub get
 | ----------- | ----------------------------------------------------------- | ------------------------ |
 | Backend     | `cd backend` → `./.venv/bin/uvicorn app.main:app --reload --port 8000` | http://localhost:8000 |
 | Backend (Docker) | `cd backend` → `docker compose up --build`            | http://localhost:8000 |
-| Teacher-Web | `cd apps/teacher-web` → `npm run dev`                        | http://localhost:5173 |
-| Admin-Web   | `cd apps/admin-web` → `npm run dev`                          | http://localhost:5174 |
-| Student-App | `cd apps/student-app` → `flutter run`                        | emulador/dispositivo    |
+| Teacher-Web | `cd frontend-web/teacher-web` → `npm run dev`            | http://localhost:5174 |
+| Admin-Web   | `cd frontend-web/admin-web` → `npm run dev`              | http://localhost:5173 |
+| Student-App | `cd mobile-app/student-app` → `flutter run`              | emulador/dispositivo    |
 | pgAdmin     | `cd backend` → `docker compose up -d pgadmin`               | http://localhost:5050  |
 
 Los scripts NO levantan los servidores automáticamente (evita procesos que bloquean la terminal); dejan la guía de comandos impresa al final.
@@ -122,7 +122,7 @@ docker inspect -f '{{.State.Health.Status}}' kawsay_postgres   # healthy
 
 - **Centralizadas**: `.env.example` en la raíz (documenta DB, JWT, puertos, IA, pgAdmin, Web). No la usa ninguna app directamente.
 - **Backend** lee `backend/.env` (pydantic-settings en `app/core/config.py`). Claves: `APP_ENV`, `DATABASE_URL`, `JWT_SECRET`, `ACCESS_TOKEN_EXPIRE_MINUTES`, `REFRESH_TOKEN_EXPIRE_DAYS`, `CORS_ORIGINS`, `AI_PROVIDER`, `AI_API_KEY`, `LOG_LEVEL`, `REQUEST_TIMEOUT_SECONDS`.
-- **Web** lee `apps/<app>/.env` con `VITE_API_URL=http://localhost:8000/api/v1`.
+- **Web** lee `frontend-web/<app>/.env` con `VITE_API_URL=http://localhost:8000/api/v1`.
 - **Docker Compose** usa `backend/docker-compose.yml` con valores por defecto (kawsay/kawsay/kawsay).
 
 > `backend/.env` está en `.gitignore`; nunca se debe versionar un `.env` con secretos reales.
@@ -152,8 +152,8 @@ docker inspect -f '{{.State.Health.Status}}' kawsay_postgres   # healthy
 
 ### Backend / migraciones
 - **`alembic upgrade head` falla** → revisa que `DATABASE_URL` en `backend/.env` apunte a postgres y que el contenedor esté `healthy`.
-- **CORS / login desde la Web** → verifica `CORS_ORIGINS` en `backend/.env` incluya `http://localhost:5173` (Teacher) y `5174` (Admin) según corresponda.
+- **CORS / login desde la Web** → verifica `CORS_ORIGINS` en `backend/.env` incluya `http://localhost:5173` (Admin) y `5174` (Docente) según corresponda.
 - **Los puertos para la app móvil** → la app usa `10.0.2.2:8000` (emulador Android). En dispositivo físico cambia `VITE_API_URL`/`ApiClient` por la IP local del host.
 
 ### Estructura del repo
-- Raíz del repo: `backend/`, `apps/`, `database/`, `docs/` y scripts `setup.*`/`clean.*`/`start-all.ps1`. Los scripts calculan su raíz a partir de su propia ubicación, por lo que funcionan desde cualquier nivel.
+- Raíz del repo: `backend/`, `frontend-web/`, `mobile-app/`, `database/`, `docs/` y scripts `setup.*`/`clean.*`/`start-all.ps1`. Los scripts calculan su raíz a partir de su propia ubicación, por lo que funcionan desde cualquier nivel.

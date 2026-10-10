@@ -32,7 +32,7 @@ Start-Process -FilePath $python `
 
 # --- Frontends ---------------------------------------------------------
 foreach ($app in @(@{Name = "admin-web"; Port = 5173 }, @{Name = "teacher-web"; Port = 5174 })) {
-  $dir = Join-Path $root ("apps\" + $app.Name)
+  $dir = Join-Path $root ("frontend-web\" + $app.Name)
   if (-not (Test-Path $dir)) { continue }
   if (-not (Test-Path (Join-Path $dir "node_modules"))) {
     Write-Step "Instalando dependencias de $($app.Name)…"

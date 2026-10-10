@@ -1,15 +1,15 @@
 name: Teacher Web CI
 on:
   push:
-    paths: ["apps/teacher-web/**"]
+    paths: ["frontend-web/teacher-web/**"]
   pull_request:
-    paths: ["apps/teacher-web/**"]
+    paths: ["frontend-web/teacher-web/**"]
 jobs:
   build:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: apps/teacher-web
+        working-directory: frontend-web/teacher-web
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

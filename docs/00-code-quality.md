@@ -18,12 +18,12 @@ black .                                               # aplicar black
 Config: `backend/pyproject.toml`. Se excluyen `.venv`, `build` y `migrations/versions/`
 (las migraciones se generan con Alembic y no deben reformatearse a mano).
 
-## 2. Flutter (apps/student-app)
+## 2. Flutter (mobile-app/student-app)
 
 Requiere Flutter SDK (no incluido en el repo). Config: `analysis_options.yaml` (flutter_lints).
 
 ```bash
-cd apps/student-app
+cd mobile-app/student-app
 flutter pub get
 dart format lib test                                  # formatear
 dart format --set-exit-if-changed --output=none lib test   # verificar sin escribir
@@ -31,12 +31,12 @@ flutter analyze                                        # linter + static analysi
 flutter test                                           # tests
 ```
 
-## 3. TypeScript / React (apps/teacher-web, apps/admin-web)
+## 3. TypeScript / React (frontend-web/teacher-web, frontend-web/admin-web)
 
 Requiere Node >= 20 y `npm install`. Config: `eslint.config.js`, `.prettierrc.json`.
 
 ```bash
-cd apps/teacher-web     # (igual para apps/admin-web)
+cd frontend-web/teacher-web  # (igual para frontend-web/admin-web)
 npm run lint            # eslint .
 npm run format          # prettier --write .
 npm run format:check    # prettier --check .
@@ -67,7 +67,7 @@ Orden sugerido antes de cada commit: 1) `clean.ps1 -DryRun` para auditar,
 
 ## 6. Notas / deuda técnica conocida
 
-- `apps/*/package.json`: runtime deps fijadas en `"latest"`. Para producción, anclar
+- `frontend-web/*/package.json`: runtime deps fijadas en `"latest"`. Para producción, anclar
   versiones exactas (`npm run build` con lockfile).
 - `python-multipart` en `requirements.txt`: no usado por endpoints actuales (sin forms);
   se mantiene porque FastAPI lo requiere si algún día se añade `OAuth2PasswordRequestForm`

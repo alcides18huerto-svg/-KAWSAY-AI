@@ -24,13 +24,14 @@ $NodeMinMajor    = 20
 $BackendPort     = 8000
 $PostgresPort    = 5432
 $PgAdminPort     = 5050
-$TeacherWebPort  = 5173
-$AdminWebPort    = 5174
+$AdminWebPort    = 5173
+$TeacherWebPort  = 5174
 $PgHealthRetries = 30
 
 $RootDir    = Split-Path -Parent $MyInvocation.MyCommand.Path
 $BackendDir = Join-Path $RootDir 'backend'
-$AppsDir    = Join-Path $RootDir 'apps'
+$FrontendDir = Join-Path $RootDir 'frontend-web'
+$MobileDir   = Join-Path $RootDir 'mobile-app'
 
 # script-scope helpers
 $Script:PythonBin   = ''
@@ -130,11 +131,11 @@ function Set-UpEnv {
     } else {
         Note "backend\.env ya existe; no se sobrescribe"
     }
-    foreach ($app in @('teacher-web', 'admin-web')) {
-        $aSrc = Join-Path $AppsDir "$app\.env.example"; $aDst = Join-Path $AppsDir "$app\.env"
+    foreach ($app in @('admin-web', 'teacher-web')) {
+        $aSrc = Join-Path $FrontendDir "$app\.env.example"; $aDst = Join-Path $FrontendDir "$app\.env"
         if (-not (Test-Path -LiteralPath $aDst)) {
             Copy-Item -LiteralPath $aSrc -Destination $aDst
-            Success "Creado apps\$app\.env"
+            Success "Creado frontend-web\$app\.env"
         }
     }
 }
@@ -193,8 +194,8 @@ function Invoke-AlembicUpgrade {
 
 # ---------------------------------- web ---------------------------------------
 function Set-UpWeb {
-    foreach ($app in @('teacher-web', 'admin-web')) {
-        Push-Location (Join-Path $AppsDir $app)
+    foreach ($app in @('admin-web', 'teacher-web')) {
+        Push-Location (Join-Path $FrontendDir $app)
         try {
             & npm install 2>&1 | Out-Null
             if ($LASTEXITCODE -ne 0) { Fail "Fallo 'npm install' en $app." }
@@ -204,7 +205,7 @@ function Set-UpWeb {
 }
 
 function Set-UpFlutter {
-    Push-Location (Join-Path $AppsDir 'student-app')
+    Push-Location (Join-Path $MobileDir 'student-app')
     try {
         & flutter pub get 2>&1 | Out-Null
         if ($LASTEXITCODE -ne 0) { Fail "Fallo 'flutter pub get'." }
@@ -233,9 +234,9 @@ Siguientes pasos - ejecutar en terminales separadas:
 
   Backend (local):    cd backend; .\.venv\Scripts\uvicorn app.main:app --reload --port 8000
   Backend (Docker):   (cd backend; docker compose up --build)
-  Teacher-Web:        cd apps\teacher-web; npm run dev        -> http://localhost:5173
-  Admin-Web:          cd apps\admin-web; npm run dev          -> http://localhost:5174
-  Student-App:        cd apps\student-app; flutter run
+  Teacher-Web:        cd frontend-web\teacher-web; npm run dev   -> http://localhost:5174
+  Admin-Web:          cd frontend-web\admin-web; npm run dev     -> http://localhost:5173
+  Student-App:        cd mobile-app\student-app; flutter run
   pgAdmin:            http://localhost:5050 (admin@kawsay.local / kawsay)
 
 Guia completa: docs\00-setup-guide.md

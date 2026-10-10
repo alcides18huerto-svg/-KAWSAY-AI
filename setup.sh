@@ -20,13 +20,14 @@ NODE_MIN_MAJOR=20
 BACKEND_PORT=8000
 POSTGRES_PORT=5432
 PGADMIN_PORT=5050
-TEACHER_WEB_PORT=5173
-ADMIN_WEB_PORT=5174
+ADMIN_WEB_PORT=5173
+TEACHER_WEB_PORT=5174
 PG_HEALTH_RETRIES=30
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BACKEND_DIR="$ROOT_DIR/backend"
-APPS_DIR="$ROOT_DIR/apps"
+FRONTEND_DIR="$ROOT_DIR/frontend-web"
+MOBILE_DIR="$ROOT_DIR/mobile-app"
 
 # --------------------------------- utilidades -------------------------------
 RED='\033[0;31m'; GREEN='\033[0;32m'; YELLOW='\033[0;33m'; CYAN='\033[0;36m'; NC='\033[0m'
@@ -122,10 +123,10 @@ setup_env(){
   else
     warn "backend/.env ya existe; no se sobrescribe"
   fi
-  for app in teacher-web admin-web; do
-    src="$APPS_DIR/$app/.env.example"; dst="$APPS_DIR/$app/.env"
+  for app in admin-web teacher-web; do
+    src="$FRONTEND_DIR/$app/.env.example"; dst="$FRONTEND_DIR/$app/.env"
     if [ ! -f "$dst" ]; then
-      cp "$src" "$dst"; info "Creado apps/$app/.env"
+      cp "$src" "$dst"; info "Creado frontend-web/$app/.env"
     fi
   done
 }
@@ -174,14 +175,14 @@ setup_migrations(){
 
 # ---------------------------------- web --------------------------------------
 setup_web(){
-  for app in teacher-web admin-web; do
-    (cd "$APPS_DIR/$app" && npm install) || fail "Falló 'npm install' en $app."
+  for app in admin-web teacher-web; do
+    (cd "$FRONTEND_DIR/$app" && npm install) || fail "Falló 'npm install' en $app."
     info "Dependencias de $app instaladas"
   done
 }
 
 setup_flutter(){
-  (cd "$APPS_DIR/student-app" && flutter pub get) || fail "Falló 'flutter pub get'."
+  (cd "$MOBILE_DIR/student-app" && flutter pub get) || fail "Falló 'flutter pub get'."
   info "Dependencias de student-app instaladas"
 }
 
@@ -206,9 +207,9 @@ Siguientes pasos — ejecutar en terminales separadas:
 
   Backend (local):    cd backend && ./.venv/bin/uvicorn app.main:app --reload --port 8000
   Backend (Docker):   (cd backend && docker compose up --build)
-  Teacher-Web:        cd apps/teacher-web && npm run dev        -> http://localhost:5173
-  Admin-Web:          cd apps/admin-web && npm run dev          -> http://localhost:5174
-  Student-App:        cd apps/student-app && flutter run
+  Teacher-Web:        cd frontend-web/teacher-web && npm run dev   -> http://localhost:5174
+  Admin-Web:          cd frontend-web/admin-web && npm run dev     -> http://localhost:5173
+  Student-App:        cd mobile-app/student-app && flutter run
   pgAdmin:            http://localhost:5050 (admin@kawsay.local / kawsay)
 
 Guía completa: docs/00-setup-guide.md
