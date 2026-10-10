@@ -5,7 +5,7 @@ from app.core.database import get_db
 from app.core.security import get_current_user, require_roles
 from app.models import *
 from app.schemas import *
-from app.ai import adapt_assignment, tutor_reply
+from app.modules.ai.service import adapt_activity_sync, tutor_reply
 
 api = APIRouter(prefix="/api/v1")
 
@@ -204,8 +204,9 @@ def generate_variants(assignment_id:str,user=Depends(require_roles("TEACHER")),d
         if exists:
             output.append({"id":exists.id,"grade":exists.grade,"content":exists.content,"status":exists.approval_status})
             continue
-        generated=adapt_assignment(assignment.base_content,ag.grade,assignment.subject)
-        v=AssignmentVariant(assignment_id=assignment.id,grade=ag.grade,content=generated["content"])
+        generated=adapt_activity_sync(assignment.base_content, ag.grade, assignment.subject)
+        v=AssignmentVariant(assignment_id=assignment.id, grade=ag.grade,
+                            content=generated.content, generated_by=generated.provider)
         db.add(v); db.flush()
         output.append({"id":v.id,"grade":v.grade,"content":v.content,"status":v.approval_status})
     db.commit()

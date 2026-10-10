@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     cors_origins: str = "http://localhost:5173,http://localhost:5174"
     ai_provider: str = "mock"
     ai_api_key: str = ""
+    ai_model: str = "gpt-4o-mini"
     log_level: str = "INFO"
     request_timeout_seconds: float = 30.0
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")

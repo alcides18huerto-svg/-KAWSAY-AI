@@ -129,6 +129,16 @@ docker inspect -f '{{.State.Health.Status}}' kawsay_postgres   # healthy
 
 ---
 
+## 6b. Sección de IA (generación de problemas por grado)
+
+- **Endpoints**: `POST /teacher/assignments/{id}/generate-variants` genera una variante por grado (1.º–6.º) sobre el área/tema indicado por el docente; queda pendiente de revisión/aprobación.
+- **Gateway**: `backend/app/modules/ai/` (base, providers OpenAI y `heurístico`, schemas, service). `POST /tutor/message` también vive ahí.
+- **Sin API key** (`AI_PROVIDER=mock`): usa el fallback heurístico local que produce ejercicios concretos y diferentes por grado y área (Matemática, Comunicación, Ciencia, Personal Social, Inglés y genérico).
+- **Con IA real**: en `backend/.env` configura `AI_PROVIDER=openai`, `AI_API_KEY=...` y `AI_MODEL=gpt-4o-mini`. Si OpenAI falla o tarda (timeout 8 s), el gateway recurre automáticamente al heurístico.
+- **Dónde verlo**: panel Docente (5174) → «Crear actividad».
+
+---
+
 ## 7. Troubleshooting
 
 ### Docker

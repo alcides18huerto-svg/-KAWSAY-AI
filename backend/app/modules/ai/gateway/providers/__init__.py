@@ -1,0 +1,1 @@
+"""Providers de IA (OpenAI + fallback heurístico)."""

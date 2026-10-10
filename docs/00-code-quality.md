@@ -1,8 +1,61 @@
 # KAWSAY AI — Calidad de Código
 
-Guía corta de linting/formateo. Todos los comandos son **idempotentes** y no alteran la lógica.
+Guía de arquitectura, calidad y linting/formateo. Todos los comandos son **idempotentes** y no alteran la lógica.
 
-## 1. Python (Backend)
+## 1. Arquitectura del proyecto (raíz)
+
+```
+KAWSAY-AI-COMPLETO/
+├── backend/              # FastAPI + PostgreSQL 16  (app/ y migraciones Alembic)
+│   └── app/
+│       ├── main.py       # bootstrap FastAPI (CORS, health/ready, routers)
+│       ├── api.py        # rutas de dominio: teacher, students, curriculum, IA, tutor…
+│       ├── models.py     # modelos SQLAlchemy centrales
+│       ├── schemas.py    # pydantic de entrada/salida
+│       ├── core/         # config, database, security, permissions
+│       ├── shared/       # models/base (Base declarativa)
+│       └── modules/      # módulos por dominio (auth, sync, ai, + stubs en 20+ áreas)
+├── frontend-web/         # Vite/React: admin-web (5173) y teacher-web (5174)
+├── mobile-app/           # student-app (Flutter, offline-first)
+├── database/             # SQL/seeds (fake_data_completo, fake_test, fake_delete_all)
+├── docs/                 # esta guía + 00-setup-guide
+└── .github/              # CI: backend, frontend-web y mobile-app
+```
+
+Scripts raíz: `setup.ps1`/`setup.sh` (bootstrap), `clean.ps1`/`clean.sh` (limpieza),
+`start-all.ps1`/`stop-all.ps1` (levantar/detener servicios) y `.env.example` (referencia).
+
+**Puertos**: Backend API 8000 · Admin-Web 5173 · Docente-Web 5174 · PostgreSQL 5432 · pgAdmin 5050.
+
+## 2. Sección de IA (gateway de adaptación por grado)
+
+Genera variantes de una actividad por grado (1.º–6.º) sobre el área/tema que indica el docente.
+
+```
+backend/app/modules/ai/
+├── __init__.py
+├── schemas.py            # AdaptedActivitySchema (contenido validado + procedencia del provider)
+├── service.py            # AIGateway: selección de provider, timeout 8s, fallback, tutor_reply
+└── gateway/
+    ├── base.py           # contrato BaseAIProvider + AIProviderError
+    └── providers/
+        ├── __init__.py
+        ├── openai_provider.py    # Structured Outputs (JSON schema) vía httpx
+        └── fallback_provider.py  # heurístico local: ejercicios distintos por grado y área
+```
+
+**Flujo**: `POST /api/v1/teacher/assignments/{id}/generate-variants` → para cada grado
+llama `adapt_activity_sync` → el gateway usa el provider configurado y, si falla o se
+excede el timeout (8 s), cae al heurístico → guarda la variante (`generated_by` = provider).
+
+**Configuración** (`backend/.env`): `AI_PROVIDER=mock` (heurístico, sin APIs externas)
+o `AI_PROVIDER=openai` + `AI_API_KEY` + `AI_MODEL=gpt-4o-mini`. El heurístico detecta el
+área (Matemática, Comunicación, Ciencia, Personal Social, Inglés, genérico) y genera
+contenido con dificultad, pasos e instrucciones apropiados a cada grado.
+
+**Dónde verlo**: panel Docente (5174) → «Crear actividad». **Tests**: `backend/tests/test_ai_gateway.py` + `test_teacher_api.py`.
+
+## 3. Python (Backend)
 
 ```bash
 cd backend
@@ -18,7 +71,7 @@ black .                                               # aplicar black
 Config: `backend/pyproject.toml`. Se excluyen `.venv`, `build` y `migrations/versions/`
 (las migraciones se generan con Alembic y no deben reformatearse a mano).
 
-## 2. Flutter (mobile-app/student-app)
+## 4. Flutter (mobile-app/student-app)
 
 Requiere Flutter SDK (no incluido en el repo). Config: `analysis_options.yaml` (flutter_lints).
 
@@ -31,7 +84,7 @@ flutter analyze                                        # linter + static analysi
 flutter test                                           # tests
 ```
 
-## 3. TypeScript / React (frontend-web/teacher-web, frontend-web/admin-web)
+## 5. TypeScript / React (frontend-web/teacher-web, frontend-web/admin-web)
 
 Requiere Node >= 20 y `npm install`. Config: `eslint.config.js`, `.prettierrc.json`.
 
@@ -42,7 +95,7 @@ npm run format          # prettier --write .
 npm run format:check    # prettier --check .
 ```
 
-## 4. Limpieza de artefactos
+## 6. Limpieza de artefactos
 
 ```bash
 ./clean.sh --dry-run    # auditoría: lista qué borraría
@@ -56,7 +109,7 @@ npm run format:check    # prettier --check .
 .\clean.ps1 -Deep
 ```
 
-## 5. Flujo recomendado (pre-commit)
+## 7. Flujo recomendado (pre-commit)
 
 ```
 clean → format → lint → build/test
@@ -65,7 +118,7 @@ clean → format → lint → build/test
 Orden sugerido antes de cada commit: 1) `clean.ps1 -DryRun` para auditar,
 2) formatear, 3) lintear, 4) correr tests.
 
-## 6. Notas / deuda técnica conocida
+## 8. Notas / deuda técnica conocida
 
 - `frontend-web/*/package.json`: runtime deps fijadas en `"latest"`. Para producción, anclar
   versiones exactas (`npm run build` con lockfile).

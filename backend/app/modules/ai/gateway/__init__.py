@@ -1,0 +1,1 @@
+"""Gateway de proveedores de IA: selección por configuración + fallback."""

@@ -1,0 +1,1 @@
+"""Módulo KAWSAY AI: gateway de adaptación de actividades por grado."""

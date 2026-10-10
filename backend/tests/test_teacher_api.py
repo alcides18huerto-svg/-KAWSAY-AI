@@ -125,3 +125,34 @@ def test_teacher_enrolls_student_by_email_idempotently(teacher_client):
         "student@example.com",
         "outside@example.com",
     }
+
+
+def test_teacher_generates_ai_variants_per_grade(teacher_client):
+    client, classroom_id, _, _ = teacher_client
+
+    created = client.post(
+        "/api/v1/teacher/assignments",
+        json={
+            "classroom_id": classroom_id,
+            "subject": "Matemática",
+            "title": "Multiplicación",
+            "base_content": "Resuelve problemas de multiplicación",
+            "grades": [1, 3, 6],
+        },
+    )
+    assert created.status_code == 200
+    assignment_id = created.json()["id"]
+
+    for attempt in (1, 2):
+        generated = client.post(
+            f"/api/v1/teacher/assignments/{assignment_id}/generate-variants"
+        )
+        assert generated.status_code == 200
+        payload = generated.json()
+        assert payload["teacher_review_required"] is True
+        variants = payload["variants"]
+        assert {v["grade"] for v in variants} == {1, 3, 6}
+        by_grade = {v["grade"]: v["content"] for v in variants}
+        # Contenido distinto por grado (IA/fallback) y con profundidad real.
+        assert by_grade[1] != by_grade[3] != by_grade[6]
+        assert all(len(v["content"]) > 40 for v in variants)
