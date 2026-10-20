@@ -1,0 +1,110 @@
+@import 'tailwindcss';
+
+/* ============================================================
+   KAWSAY AI — Design tokens (Tailwind v4)
+   Paleta de marca + tokens semánticos de la interfaz docente.
+   ============================================================ */
+
+@theme {
+  /* --- Marca: azul KAWSAY --- */
+  --color-kawsay-50: #eaf5ff;
+  --color-kawsay-100: #d9ecff;
+  --color-kawsay-200: #cfe6ff;
+  --color-kawsay-300: #91c9ff;
+  --color-kawsay-400: #55a7ff;
+  --color-kawsay-500: #2583f5;
+  --color-kawsay-600: #1d6dd3;
+  --color-kawsay-700: #1553a5;
+  --color-kawsay-800: #164889;
+  --color-kawsay-900: #103b78;
+  --color-kawsay-text: #123568;
+
+  /* --- Acentos --- */
+  --color-kawsay-teal: #20b8aa;
+  --color-kawsay-purple: #8b5cf6;
+  --color-kawsay-success: #16a34a;
+  --color-kawsay-alert: #f43f5e;
+
+  /* --- Tipografía --- */
+  --font-sans:
+    'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  /* --- Sombras de elevación --- */
+  --shadow-card: 0 1px 2px 0 rgb(18 53 104 / 0.04), 0 8px 24px -4px rgb(18 53 104 / 0.08);
+  --shadow-raised: 0 2px 4px 0 rgb(18 53 104 / 0.06), 0 16px 40px -8px rgb(18 53 104 / 0.14);
+}
+
+/* ============================================================
+   Tokens semánticos en @layer base
+   Se usan vía clases utilitarias (bg-surface, text-ink, ...).
+   ============================================================ */
+
+@layer base {
+  :root {
+    --color-surface: #ffffff;
+    --color-canvas: #f6f9fd;
+    --color-line: #e3ecf7;
+    --color-ink: #123568;
+    --color-ink-soft: #5a7392;
+    --color-ink-faint: #8ba0ba;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    margin: 0;
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Foco visible y accesible en toda la app. */
+  :where(button, a, input, select, textarea, [tabindex]):focus-visible {
+    outline: 2px solid var(--color-kawsay-500);
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+
+  /* Barra de desplazamiento discreta y coherente con la paleta. */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #cbdcef transparent;
+  }
+
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #cbdcef;
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #a9c4e0;
+  }
+}
+
+@layer utilities {
+  /* Anillo de progreso accesible: el valor siempre se muestra en texto. */
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .motion-safe\:transition-none {
+      transition: none !important;
+    }
+  }
+}
