@@ -1,0 +1,28 @@
+# KAWSAY AI — Blueprint de Render
+# https://render.com/docs/blueprint-spec
+#
+# Este archivo declara el servicio como Python NATIVO (no Docker),
+# con "rootDir: backend" para que Render ignore cualquier Dockerfile.
+services:
+  - type: web
+    name: kawsay-ai-api
+    runtime: python            # <-- entorno nativo Python (NO docker)
+    rootDir: backend           # <-- el código vive en /backend del repositorio
+    plan: free
+    region: oregon
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health   # ajusta si tu endpoint de salud tiene otra ruta
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false            # pégalo desde tu base PostgreSQL de Render (External DB URL)
+      - key: JWT_SECRET
+        generateValue: true    # Render genera un secreto aleatorio seguro la 1ª vez
+      - key: CORS_ORIGINS
+        sync: false            # ej: https://tu-teacher.vercel.app,https://tu-admin.vercel.app
+      - key: AI_PROVIDER
+        value: mock
+      - key: PYTHON_VERSION
+        value: "3.12.8"

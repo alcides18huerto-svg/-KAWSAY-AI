@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {createRoot} from "react-dom/client";
 import {request} from "./api";
 import "./styles.css";
@@ -7,6 +7,29 @@ type School = {id:string; name:string; region:string|null};
 type Classroom = {id:string; name:string; school_id:string; school_year:number};
 type Subject = {id:string; name:string; grade:number};
 type View = "dashboard"|"schools"|"classrooms"|"curriculum"|"accounts";
+
+/** Valida la sesión guardada sin lanzar aunque localStorage no esté disponible. */
+function readStoredSession():boolean {
+  try { return !!localStorage.getItem("token"); }
+  catch { return false; }
+}
+
+/** Error de límite (boundary): evita que un fallo al pintar la pantalla deje el sitio en blanco. */
+class ErrorBoundary extends React.Component<{children:React.ReactNode},{error:Error|null}> {
+  state:{error:Error|null}={error:null};
+  static getDerivedStateFromError(error:Error){ return {error}; }
+  componentDidCatch(error:Error){ console.error("KAWSAY administración:",error); }
+  render(){
+    if(this.state.error) return <div className="center">
+      <div className="card" style={{maxWidth:"26rem",textAlign:"center"}}>
+        <h1>Algo salió mal</h1>
+        <p className="muted">{this.state.error.message||"Ocurrió un error inesperado al mostrar la pantalla."}</p>
+        <button onClick={()=>window.location.reload()}>Recargar la página</button>
+      </div>
+    </div>;
+    return this.props.children;
+  }
+}
 
 function Login({done}:{done:()=>void}) {
   const [email,setEmail]=useState("");
@@ -34,7 +57,7 @@ function Login({done}:{done:()=>void}) {
 }
 
 function App() {
-  const [logged,setLogged]=useState(!!localStorage.getItem("token"));
+  const [logged,setLogged]=useState(readStoredSession);
   const [view,setView]=useState<View>("dashboard");
   const [schools,setSchools]=useState<School[]>([]);
   const [classrooms,setClassrooms]=useState<Classroom[]>([]);
@@ -53,8 +76,14 @@ function App() {
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
   const [status,setStatus]=useState("");
+  /** Identificador de la sesión actual: invalida respuestas tardías al salir o cambiar de cuenta. */
+  const sessionRef = useRef(0);
+
+  /** Descarta resultados asíncronos si la sesión cambió mientras llegaba la respuesta. */
+  function guardSession(token:number){ return token===sessionRef.current&&logged; }
 
   async function loadView(next:View) {
+    const token = sessionRef.current;
     setView(next); setError(""); setStatus(""); setLoading(true);
     try {
       if(next==="dashboard"||next==="schools"||next==="classrooms") {
@@ -62,13 +91,22 @@ function App() {
           request<School[]>("/schools"),
           request<Classroom[]>("/classrooms"),
         ]);
+        if(!guardSession(token)) return;
         setSchools(schoolRows); setClassrooms(classroomRows);
         if(!selectedSchool&&schoolRows.length) setSelectedSchool(schoolRows[0].id);
       }
-      if(next==="curriculum") setSubjects(await request<Subject[]>(subjectGrade?`/curriculum/subjects?grade=${subjectGrade}`:"/curriculum/subjects"));
-      if(next==="accounts") setSchools(await request<School[]>("/schools"));
-    } catch(error) { setError(error instanceof Error?error.message:"No se pudieron cargar los datos."); }
-    finally { setLoading(false); }
+      if(next==="curriculum") {
+        const rows=await request<Subject[]>(subjectGrade?`/curriculum/subjects?grade=${subjectGrade}`:"/curriculum/subjects");
+        if(guardSession(token)) setSubjects(rows);
+      }
+      if(next==="accounts") {
+        const rows=await request<School[]>("/schools");
+        if(guardSession(token)) setSchools(rows);
+      }
+    } catch(error) {
+      if(guardSession(token)) setError(error instanceof Error?error.message:"No se pudieron cargar los datos.");
+    }
+    finally { if(guardSession(token)) setLoading(false); }
   }
 
   useEffect(()=>{if(logged) void loadView("dashboard");},[logged]);
@@ -125,7 +163,7 @@ function App() {
         ["dashboard","Dashboard"],["schools","Escuelas"],["classrooms","Aulas"],
         ["curriculum","Currículo"],["accounts","Cuentas"],
       ] as [View,string][]).map(([key,label])=><button className={`nav ${view===key?"selected":""}`} key={key} onClick={()=>void loadView(key)}>{label}</button>)}
-      <button className="ghost" onClick={()=>{localStorage.removeItem("token");setLogged(false);}}>Salir</button>
+      <button className="ghost" onClick={()=>{sessionRef.current++; localStorage.removeItem("token"); setLogged(false);}}>Salir</button>
     </aside>
     <main>
       <header><h1>{viewTitles[view]}</h1><p>Gestión de escuelas, aulas, currículo y cuentas de la plataforma.</p></header>
@@ -215,4 +253,10 @@ function App() {
   </div>;
 }
 
-createRoot(document.getElementById("root")!).render(<App/>);
+createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <ErrorBoundary>
+      <App/>
+    </ErrorBoundary>
+  </React.StrictMode>
+);

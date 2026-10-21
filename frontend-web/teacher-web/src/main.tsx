@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useCallback, useEffect, useRef, useState} from "react";
 import {createRoot} from "react-dom/client";
 import {claimFromToken, request, roleFromToken} from "./api";
 import {Badge, Button, Card, EmptyState, Field, GradeChips, InfoNote, Metric, ProgressBar, Select, inputClass, tdClass, thClass} from "./components/ui";
@@ -121,13 +121,35 @@ function Login({done}:{done:()=>void}) {
 }
 
 function readStoredSession():boolean {
-  const token=localStorage.getItem("token");
-  if(!token) return false;
-  const role=roleFromToken(token);
-  const exp=claimFromToken<number>(token,"exp");
-  const valid=role==="TEACHER"&&!!exp&&exp*1000>Date.now();
-  if(!valid) localStorage.removeItem("token");
-  return valid;
+  try {
+    const token=localStorage.getItem("token");
+    if(!token) return false;
+    const role=roleFromToken(token);
+    const exp=claimFromToken<number>(token,"exp");
+    const valid=role==="TEACHER"&&!!exp&&exp*1000>Date.now();
+    if(!valid) localStorage.removeItem("token");
+    return valid;
+  } catch {
+    // localStorage no disponible o dato corrupto: siempre falla abierto hacia el login.
+    return false;
+  }
+}
+
+/** Error de límite (boundary): evita que un fallo al pintar la pantalla deje el sitio en blanco. */
+class ErrorBoundary extends React.Component<{children:React.ReactNode},{error:Error|null}> {
+  state:{error:Error|null}={error:null};
+  static getDerivedStateFromError(error:Error){ return {error}; }
+  componentDidCatch(error:Error){ console.error("KAWSAY docente:",error); }
+  render(){
+    if(this.state.error) return <div className="grid min-h-screen place-items-center bg-canvas p-6">
+      <div className="max-w-md rounded-2xl border border-line bg-surface p-8 text-center shadow-raised">
+        <h1 className="mb-2 text-lg font-bold text-ink">Algo salió mal</h1>
+        <p className="mb-5 text-sm text-ink-soft">{this.state.error.message||"Ocurrió un error inesperado al mostrar la pantalla."}</p>
+        <button className="rounded-xl bg-kawsay-600 px-4 py-2.5 font-semibold text-white transition hover:bg-kawsay-700" onClick={()=>window.location.reload()}>Recargar la página</button>
+      </div>
+    </div>;
+    return this.props.children;
+  }
 }
 
 function App() {
@@ -163,13 +185,20 @@ function App() {
   const [busy,setBusy]=useState(false);
   const [loading,setLoading]=useState(false);
   const [error,setError]=useState("");
+  /** Identificador de la sesión actual: invalida respuestas tardías al salir o cambiar de cuenta. */
+  const sessionRef = useRef(0);
+
+  /** Descarta resultados asíncronos si la sesión cambió o el componente se desmontó. */
+  const guardSession = useCallback((token:number)=>token===sessionRef.current&&logged,[]);
 
   async function loadBase() {
+    const token = sessionRef.current;
     try {
       const [classroomRows,schoolRows]=await Promise.all([
         request<Classroom[]>("/classrooms"),
         request<School[]>("/schools"),
       ]);
+      if(!guardSession(token)) return;
       setClassrooms(classroomRows); setSchools(schoolRows);
       if(!selectedClassroom&&classroomRows.length) setSelectedClassroom(classroomRows[0].id);
       if(!selectedSchool&&schoolRows.length) setSelectedSchool(schoolRows[0].id);
@@ -207,50 +236,50 @@ function App() {
 
   const selectedRoom = classrooms.find(room=>room.id===selectedClassroom) ?? null;
 
+  /** Carga los datos del resumen en paralelo (una sola ronda de red, sin peticiones duplicadas). */
+  async function loadDashboard(token:number) {
+    const [dashboardResult,assignmentsResult,flagsResult,studentsResult,progressResult,interventionsResult]=
+      await Promise.allSettled([
+        request<Dashboard>("/teacher/dashboard"),
+        request<Assignment[]>("/teacher/assignments"),
+        request<SupportFlag[]>("/teacher/support-flags"),
+        request<Student[]>("/teacher/students"),
+        request<ProgressStudent[]>("/teacher/progress"),
+        request<Intervention[]>("/teacher/interventions"),
+      ]);
+    if(!guardSession(token)) return;
+    if(dashboardResult.status==="fulfilled") setDashboard(dashboardResult.value);
+    if(assignmentsResult.status==="fulfilled") setAssignments(assignmentsResult.value);
+    if(flagsResult.status==="fulfilled") setFlags(flagsResult.value);
+    if(studentsResult.status==="fulfilled") setStudents(studentsResult.value);
+    if(progressResult.status==="fulfilled") setProgress(progressResult.value);
+    if(interventionsResult.status==="fulfilled") setInterventions(interventionsResult.value);
+  }
+
   async function loadView(next:View, focusStudentId?:string) {
+    const token = sessionRef.current;
     setView(next); setError(""); setStatus(""); setLoading(true);
     try {
       if(next==="dashboard") {
-        try {
-          setDashboard(await request<Dashboard>("/teacher/dashboard"));
-        } catch (e) {
-          // ignore
-        }
-        try {
-          setAssignments(await request<Assignment[]>("/teacher/assignments"));
-        } catch (e) {}
-        try {
-          const [flagRows,studentRows]=await Promise.all([
-            request<SupportFlag[]>("/teacher/support-flags"),
-            request<Student[]>("/teacher/students"),
-          ]);
-          setFlags(flagRows); setStudents(studentRows);
-        } catch (e) {}
-        try {
-          setProgress(await request<ProgressStudent[]>("/teacher/progress"));
-        } catch (e) {}
-        try {
-          const [studentRows,interventionRows]=await Promise.all([
-            request<Student[]>("/teacher/students"),
-            request<Intervention[]>("/teacher/interventions"),
-          ]);
-          setStudents(studentRows); setInterventions(interventionRows);
-        } catch (e) {}
+        await loadDashboard(token);
       }
       if(next==="classrooms") {
         await loadBase();
         try {
-          setStudents(await request<Student[]>("/teacher/students"));
+          const rows=await request<Student[]>("/teacher/students");
+          if(guardSession(token)) setStudents(rows);
         } catch (e) {}
       }
       if(next==="students") {
         try {
-          setStudents(await request<Student[]>("/teacher/students"));
+          const rows=await request<Student[]>("/teacher/students");
+          if(guardSession(token)) setStudents(rows);
         } catch (e) {}
       }
       if(next==="progress") {
         try {
-          setProgress(await request<ProgressStudent[]>("/teacher/progress"));
+          const rows=await request<ProgressStudent[]>("/teacher/progress");
+          if(guardSession(token)) setProgress(rows);
         } catch (e) {}
       }
       if(next==="flags") {
@@ -259,6 +288,7 @@ function App() {
             request<SupportFlag[]>("/teacher/support-flags"),
             request<Student[]>("/teacher/students"),
           ]);
+          if(!guardSession(token)) return;
           setFlags(flagRows); setStudents(studentRows);
         } catch (e) {}
       }
@@ -268,6 +298,7 @@ function App() {
             request<Student[]>("/teacher/students"),
             request<Intervention[]>("/teacher/interventions"),
           ]);
+          if(!guardSession(token)) return;
           setStudents(studentRows); setInterventions(interventionRows);
           if(focusStudentId) setInterventionStudent(focusStudentId);
           else if(!interventionStudent&&studentRows.length) setInterventionStudent(studentRows[0].id);
@@ -275,15 +306,24 @@ function App() {
       }
       if(next==="assignments") {
         try {
-          setAssignments(await request<Assignment[]>("/teacher/assignments"));
+          const rows=await request<Assignment[]>("/teacher/assignments");
+          if(guardSession(token)) setAssignments(rows);
         } catch (e) {}
       }
       if(next==="create") await loadBase();
-    } catch(error) { setError(error instanceof Error?error.message:"No se pudieron cargar los datos."); }
-    finally { setLoading(false); }
+    } catch(error) {
+      if(guardSession(token)) setError(error instanceof Error?error.message:"No se pudieron cargar los datos.");
+    }
+    finally { if(guardSession(token)) setLoading(false); }
   }
 
-  useEffect(()=>{if(logged) { void loadView("dashboard"); void loadView("assignments"); void loadView("progress"); void loadView("flags"); void loadView("interventions"); }},[logged]);
+  useEffect(()=>{
+    if(!logged) return;
+    // Al iniciar sesión solo se carga el resumen (que ya trae actividades,
+    // progreso, alertas e intervenciones); las demás vistas se cargan al navegar.
+    void loadView("dashboard");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[logged]);
 
   async function runAction(action:()=>Promise<void>,successMessage?:string) {
     setBusy(true); setError(""); setStatus("");
@@ -362,8 +402,9 @@ function App() {
     });
   }
 
-  async function editAssignment(id:string) {
+  function editAssignment(id:string) {
     // For now just navigate to create - in a full implementation would load assignment data
+    void id;
     setView("create");
     setStatus("Selecciona los datos para editar esta actividad (funcionalidad en desarrollo)");
   }
@@ -434,7 +475,7 @@ function App() {
             <dd className="tabular text-sm font-bold">{students.length}</dd>
           </div>
         </dl>
-        <button className="w-full rounded-xl border border-white/15 px-3.5 py-2.5 text-sm font-medium text-kawsay-200 transition hover:bg-white/10 hover:text-white" onClick={()=>{localStorage.removeItem("token");setLogged(false);}}>Salir</button>
+        <button className="w-full rounded-xl border border-white/15 px-3.5 py-2.5 text-sm font-medium text-kawsay-200 transition hover:bg-white/10 hover:text-white" onClick={()=>{sessionRef.current++; localStorage.removeItem("token"); setLogged(false);}}>Salir</button>
       </div>
     </aside>
 
@@ -690,7 +731,7 @@ function App() {
                   <td className={tdClass}>
                     <div className="flex flex-wrap items-center gap-2">
                       <Button variant="small" onClick={()=>void loadVariants(item.id)}>Ver detalles y variantes</Button>
-                      <Button variant="small" onClick={()=>void editAssignment(item.id)}>Editar</Button>
+                      <Button variant="small" onClick={()=>editAssignment(item.id)}>Editar</Button>
                     </div>
                   </td>
                 </tr>)}</tbody>
@@ -780,4 +821,10 @@ function App() {
   </div>;
 }
 
-createRoot(document.getElementById("root")!).render(<App/>);
+createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
+    <ErrorBoundary>
+      <App/>
+    </ErrorBoundary>
+  </React.StrictMode>
+);
