@@ -28,6 +28,11 @@ Abstención 9/9 con umbral 0,65. Sin datos reales autorizados, calibración ni v
 
 Trabajo local exclusivo en `feature/entrenamiento-ia`; estado inicial limpio.
 `gh auth status`: sin autenticación. No se puede crear PR remoto con gh en este estado.
+Commit de implementación: `e3439ff` — Implementar entrenamiento e inferencia offline de IA.
+Se revisó el diff respecto de `main`, que inicialmente apuntaba al mismo commit de base.
+Se intentó `git push -u origin feature/entrenamiento-ia` sin interacción y GitHub respondió
+`No anonymous write access` / `Authentication failed`. La rama no se publicó y no se creó PR remoto.
+No se cambiaron credenciales ni configuración Git para sortear ese bloqueo.
 Este archivo contiene el cuerpo listo para publicar al disponer de acceso:
 
 ```sh

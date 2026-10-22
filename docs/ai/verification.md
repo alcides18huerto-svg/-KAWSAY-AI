@@ -18,6 +18,7 @@ Desde `backend/`, utilizando el Python del venv:
 | `python -m pytest -q --junitxml=../docs/ai/test-results.xml` | **39 passed, 50 warnings in 4.32s** |
 | `python -m ruff check app/modules/ai --output-format concise` | All checks passed |
 | `git diff --check` | Sin errores de whitespace; avisos Git de conversión LF/CRLF del entorno |
+| SHA-256 del blob model.json preparado en el índice Git frente a metadata | Coincide; bytes LF verificados antes del commit |
 
 Evidencia máquina: [test-results.xml](test-results.xml). Las 39 pruebas incluyen las 7 pruebas previas
 y 32 nuevas. No se sustituyeron ni eliminaron pruebas previas. Los 50 warnings son deprecaciones
@@ -104,7 +105,8 @@ Reportes completos: `backend/app/modules/ai/models/difficulty-v1-2be2a78c56b6/`.
 - OpenAI real: no se enviaron ejercicios a servicios externos ni se consumieron credenciales. Se
   verificaron gateway, timeout, seguridad y fallback mediante proveedores de prueba.
 - GitHub: `gh auth status` indica que no hay sesión autenticada. El PR se prepara en `pull-request.md`;
-  el resultado de publicación se registra en la sección Git de ese documento.
+  el intento de push respondió `No anonymous write access` / `Authentication failed`. Commit local
+  de implementación `e3439ff`; rama y PR remoto pendientes de credenciales con permisos.
 - Web React: no hubo cambios en sus archivos; se preservaron campos/URLs anteriores. No se ejecutó build.
 
 No se ha desplegado en Render, modificado producción ni autorizado el modelo para estudiantes reales.
