@@ -6,6 +6,7 @@ from app.core.security import get_current_user, require_roles
 from app.models import *
 from app.schemas import *
 from app.modules.ai.service import adapt_activity_sync, tutor_reply
+from app.modules.ai.inference import classify_stored_activity
 
 api = APIRouter(prefix="/api/v1")
 
@@ -202,13 +203,17 @@ def generate_variants(assignment_id:str,user=Depends(require_roles("TEACHER")),d
         exists=db.scalar(select(AssignmentVariant).where(
             AssignmentVariant.assignment_id==assignment_id, AssignmentVariant.grade==ag.grade))
         if exists:
-            output.append({"id":exists.id,"grade":exists.grade,"content":exists.content,"status":exists.approval_status})
+            prediction = classify_stored_activity(assignment.base_content, ag.grade, assignment.subject)
+            output.append({"id":exists.id,"grade":exists.grade,"content":exists.content,"status":exists.approval_status,
+                           "provider": exists.generated_by, "classification": prediction.model_dump()})
             continue
         generated=adapt_activity_sync(assignment.base_content, ag.grade, assignment.subject)
         v=AssignmentVariant(assignment_id=assignment.id, grade=ag.grade,
                             content=generated.content, generated_by=generated.provider)
         db.add(v); db.flush()
-        output.append({"id":v.id,"grade":v.grade,"content":v.content,"status":v.approval_status})
+        output.append({"id":v.id,"grade":v.grade,"content":v.content,"status":v.approval_status,
+                       "provider": generated.provider, "classification": generated.classification.model_dump() if generated.classification else None,
+                       "adaptation_strategy": generated.adaptation_strategy})
     db.commit()
     return {"variants":output,"teacher_review_required":True}
 
@@ -218,6 +223,20 @@ def variants(assignment_id:str,user=Depends(require_roles("TEACHER")),db:Session
     if not a or a.teacher_id!=user.id: raise HTTPException(404,"No encontrado")
     rows=db.scalars(select(AssignmentVariant).where(AssignmentVariant.assignment_id==assignment_id)).all()
     return [{"id":x.id,"grade":x.grade,"content":x.content,"status":x.approval_status} for x in rows]
+
+@api.patch("/teacher/assignments/{assignment_id}/variants/{variant_id}")
+def correct_variant(assignment_id:str, variant_id:str, payload:VariantUpdate,
+                    user=Depends(require_roles("TEACHER")), db:Session=Depends(get_db)):
+    assignment = db.get(Assignment, assignment_id)
+    variant = db.get(AssignmentVariant, variant_id)
+    if not assignment or assignment.teacher_id != user.id or not variant or variant.assignment_id != assignment_id:
+        raise HTTPException(404, "Variante no encontrada")
+    variant.content = payload.content
+    variant.generated_by = "teacher"
+    variant.approval_status = "PENDING"
+    assignment.status = "DRAFT"
+    db.commit()
+    return {"id": variant.id, "status": "PENDING", "teacher_review_required": True}
 
 @api.post("/teacher/assignments/{assignment_id}/approve")
 def approve(assignment_id:str,user=Depends(require_roles("TEACHER")),db:Session=Depends(get_db)):
@@ -256,13 +275,17 @@ def my_assignments(user=Depends(require_roles("STUDENT")),db:Session=Depends(get
 
 @api.post("/learning/attempts")
 def create_attempt(payload:AttemptCreate,user=Depends(require_roles("STUDENT")),db:Session=Depends(get_db)):
-    if db.get(LearningAttempt,payload.id): return {"status":"already_synced","id":payload.id}
+    existing = db.get(LearningAttempt, payload.id)
+    if existing:
+        if existing.student_id != user.id or any(getattr(existing, key) != value for key, value in payload.model_dump(exclude={"id"}).items()):
+            raise HTTPException(409, "Conflicto de identificador de intento")
+        return {"status":"already_synced","id":payload.id}
     obj=LearningAttempt(student_id=user.id,**payload.model_dump())
     db.add(obj)
     progress=db.scalar(select(StudentProgress).where(StudentProgress.student_id==user.id,
                                                      StudentProgress.subject=="General"))
     if not progress:
-        progress=StudentProgress(student_id=user.id,subject="General")
+        progress=StudentProgress(student_id=user.id,subject="General",total_attempts=0,correct_attempts=0,mastery_level=0)
         db.add(progress)
     progress.total_attempts += 1
     if payload.is_correct: progress.correct_attempts += 1
@@ -324,5 +347,18 @@ def intervention(payload:InterventionCreate,user=Depends(require_roles("TEACHER"
 @api.post("/tutor/message")
 def tutor(payload:TutorRequest,user=Depends(require_roles("STUDENT")),db:Session=Depends(get_db)):
     profile=db.get(StudentProfile,user.id)
+    approved_content = None
+    if profile and payload.assignment_id:
+        classroom_ids = select(ClassroomStudent.classroom_id).where(ClassroomStudent.student_id == user.id)
+        approved_content = db.scalar(
+            select(AssignmentVariant.content)
+            .join(Assignment, Assignment.id == AssignmentVariant.assignment_id)
+            .where(Assignment.id == payload.assignment_id, Assignment.classroom_id.in_(classroom_ids),
+                   Assignment.status == "PUBLISHED", AssignmentVariant.approval_status == "APPROVED",
+                   AssignmentVariant.grade == profile.grade)
+        )
+        if approved_content is None:
+            raise HTTPException(404, "Actividad aprobada no encontrada")
     return {"reply":tutor_reply(payload.message, profile.grade if profile else None,
-                                payload.subject,payload.topic)}
+                                payload.subject,payload.topic, approved_content, payload.hint_level),
+            "mode": "approved_content_guidance", "supervision_required": True}

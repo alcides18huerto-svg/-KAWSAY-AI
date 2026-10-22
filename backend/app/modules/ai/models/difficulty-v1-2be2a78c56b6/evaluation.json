@@ -1,0 +1,401 @@
+{
+  "baseline_test": {
+    "accuracy": 0.3333333333333333,
+    "confusion_matrix": [
+      [
+        0,
+        0,
+        3
+      ],
+      [
+        0,
+        0,
+        3
+      ],
+      [
+        0,
+        0,
+        3
+      ]
+    ],
+    "errors": [
+      {
+        "expected": "BASIC",
+        "index": 0,
+        "predicted": "ADVANCED"
+      },
+      {
+        "expected": "INTERMEDIATE",
+        "index": 2,
+        "predicted": "ADVANCED"
+      },
+      {
+        "expected": "INTERMEDIATE",
+        "index": 3,
+        "predicted": "ADVANCED"
+      },
+      {
+        "expected": "BASIC",
+        "index": 5,
+        "predicted": "ADVANCED"
+      },
+      {
+        "expected": "BASIC",
+        "index": 6,
+        "predicted": "ADVANCED"
+      },
+      {
+        "expected": "INTERMEDIATE",
+        "index": 7,
+        "predicted": "ADVANCED"
+      }
+    ],
+    "f1_macro": 0.16666666666666666,
+    "labels": [
+      "BASIC",
+      "INTERMEDIATE",
+      "ADVANCED"
+    ],
+    "per_class": {
+      "ADVANCED": {
+        "f1-score": 0.5,
+        "precision": 0.3333333333333333,
+        "recall": 1.0,
+        "support": 3.0
+      },
+      "BASIC": {
+        "f1-score": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 3.0
+      },
+      "INTERMEDIATE": {
+        "f1-score": 0.0,
+        "precision": 0.0,
+        "recall": 0.0,
+        "support": 3.0
+      }
+    },
+    "precision_macro": 0.1111111111111111,
+    "recall_macro": 0.3333333333333333
+  },
+  "dataset": {
+    "class_distribution": {
+      "ADVANCED": 15,
+      "BASIC": 15,
+      "INTERMEDIATE": 15
+    },
+    "duplicates_removed": 0,
+    "missing_values": {
+      "activity_type": 45,
+      "competency": 45,
+      "grade": 45,
+      "prerequisites": 45,
+      "subject": 45,
+      "topic": 45
+    },
+    "origin": "synthetic",
+    "rows": 45,
+    "sha256": "f28ed912e4d73f1207f04645f6e52a0fd92f86dd2897986ab7b16e8c2f1d8a32",
+    "sources": [
+      "KAWSAY technical fixture v1; no pedagogical approval"
+    ]
+  },
+  "seed": 42,
+  "selected": "multinomial_nb",
+  "selection_partition": "validation",
+  "selective_test": {
+    "accepted": 0,
+    "confidence_calibrated": false,
+    "confidence_only_coverage": 0.0,
+    "note": "Runtime also abstains when vocabulary coverage is below 0.3. Fixed technical threshold, not pedagogically optimized.",
+    "threshold": 0.65,
+    "total": 9
+  },
+  "split_families": {
+    "test": [
+      "advanced-03",
+      "advanced-06",
+      "advanced-12",
+      "basic-01",
+      "basic-02",
+      "basic-07",
+      "intermediate-09",
+      "intermediate-11",
+      "intermediate-14"
+    ],
+    "train": [
+      "advanced-00",
+      "advanced-01",
+      "advanced-02",
+      "advanced-05",
+      "advanced-08",
+      "advanced-09",
+      "advanced-11",
+      "advanced-13",
+      "advanced-14",
+      "basic-00",
+      "basic-03",
+      "basic-06",
+      "basic-08",
+      "basic-09",
+      "basic-10",
+      "basic-11",
+      "basic-12",
+      "basic-13",
+      "intermediate-01",
+      "intermediate-02",
+      "intermediate-03",
+      "intermediate-04",
+      "intermediate-06",
+      "intermediate-07",
+      "intermediate-10",
+      "intermediate-12",
+      "intermediate-13"
+    ],
+    "validation": [
+      "advanced-04",
+      "advanced-07",
+      "advanced-10",
+      "basic-04",
+      "basic-05",
+      "basic-14",
+      "intermediate-00",
+      "intermediate-05",
+      "intermediate-08"
+    ]
+  },
+  "split_sizes": {
+    "test": 9,
+    "train": 27,
+    "validation": 9
+  },
+  "test": {
+    "accuracy": 0.6666666666666666,
+    "confusion_matrix": [
+      [
+        1,
+        2,
+        0
+      ],
+      [
+        0,
+        3,
+        0
+      ],
+      [
+        0,
+        1,
+        2
+      ]
+    ],
+    "errors": [
+      {
+        "expected": "BASIC",
+        "index": 0,
+        "predicted": "INTERMEDIATE"
+      },
+      {
+        "expected": "BASIC",
+        "index": 5,
+        "predicted": "INTERMEDIATE"
+      },
+      {
+        "expected": "ADVANCED",
+        "index": 8,
+        "predicted": "INTERMEDIATE"
+      }
+    ],
+    "f1_macro": 0.6555555555555556,
+    "labels": [
+      "BASIC",
+      "INTERMEDIATE",
+      "ADVANCED"
+    ],
+    "log_loss": 0.9747659644986985,
+    "per_class": {
+      "ADVANCED": {
+        "f1-score": 0.8,
+        "precision": 1.0,
+        "recall": 0.6666666666666666,
+        "support": 3.0
+      },
+      "BASIC": {
+        "f1-score": 0.5,
+        "precision": 1.0,
+        "recall": 0.3333333333333333,
+        "support": 3.0
+      },
+      "INTERMEDIATE": {
+        "f1-score": 0.6666666666666666,
+        "precision": 0.5,
+        "recall": 1.0,
+        "support": 3.0
+      }
+    },
+    "precision_macro": 0.8333333333333334,
+    "recall_macro": 0.6666666666666666
+  },
+  "validation": {
+    "logistic_regression": {
+      "accuracy": 0.2222222222222222,
+      "confusion_matrix": [
+        [
+          0,
+          2,
+          1
+        ],
+        [
+          1,
+          0,
+          2
+        ],
+        [
+          0,
+          1,
+          2
+        ]
+      ],
+      "errors": [
+        {
+          "expected": "INTERMEDIATE",
+          "index": 1,
+          "predicted": "ADVANCED"
+        },
+        {
+          "expected": "BASIC",
+          "index": 2,
+          "predicted": "INTERMEDIATE"
+        },
+        {
+          "expected": "ADVANCED",
+          "index": 3,
+          "predicted": "INTERMEDIATE"
+        },
+        {
+          "expected": "BASIC",
+          "index": 4,
+          "predicted": "ADVANCED"
+        },
+        {
+          "expected": "BASIC",
+          "index": 5,
+          "predicted": "INTERMEDIATE"
+        },
+        {
+          "expected": "INTERMEDIATE",
+          "index": 7,
+          "predicted": "ADVANCED"
+        },
+        {
+          "expected": "INTERMEDIATE",
+          "index": 8,
+          "predicted": "BASIC"
+        }
+      ],
+      "f1_macro": 0.16666666666666666,
+      "labels": [
+        "BASIC",
+        "INTERMEDIATE",
+        "ADVANCED"
+      ],
+      "per_class": {
+        "ADVANCED": {
+          "f1-score": 0.5,
+          "precision": 0.4,
+          "recall": 0.6666666666666666,
+          "support": 3.0
+        },
+        "BASIC": {
+          "f1-score": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 3.0
+        },
+        "INTERMEDIATE": {
+          "f1-score": 0.0,
+          "precision": 0.0,
+          "recall": 0.0,
+          "support": 3.0
+        }
+      },
+      "precision_macro": 0.13333333333333333,
+      "recall_macro": 0.2222222222222222
+    },
+    "multinomial_nb": {
+      "accuracy": 0.4444444444444444,
+      "confusion_matrix": [
+        [
+          1,
+          1,
+          1
+        ],
+        [
+          1,
+          1,
+          1
+        ],
+        [
+          0,
+          1,
+          2
+        ]
+      ],
+      "errors": [
+        {
+          "expected": "INTERMEDIATE",
+          "index": 1,
+          "predicted": "ADVANCED"
+        },
+        {
+          "expected": "BASIC",
+          "index": 2,
+          "predicted": "INTERMEDIATE"
+        },
+        {
+          "expected": "ADVANCED",
+          "index": 3,
+          "predicted": "INTERMEDIATE"
+        },
+        {
+          "expected": "BASIC",
+          "index": 4,
+          "predicted": "ADVANCED"
+        },
+        {
+          "expected": "INTERMEDIATE",
+          "index": 8,
+          "predicted": "BASIC"
+        }
+      ],
+      "f1_macro": 0.43492063492063493,
+      "labels": [
+        "BASIC",
+        "INTERMEDIATE",
+        "ADVANCED"
+      ],
+      "per_class": {
+        "ADVANCED": {
+          "f1-score": 0.5714285714285714,
+          "precision": 0.5,
+          "recall": 0.6666666666666666,
+          "support": 3.0
+        },
+        "BASIC": {
+          "f1-score": 0.4,
+          "precision": 0.5,
+          "recall": 0.3333333333333333,
+          "support": 3.0
+        },
+        "INTERMEDIATE": {
+          "f1-score": 0.3333333333333333,
+          "precision": 0.3333333333333333,
+          "recall": 0.3333333333333333,
+          "support": 3.0
+        }
+      },
+      "precision_macro": 0.4444444444444444,
+      "recall_macro": 0.4444444444444444
+    }
+  }
+}

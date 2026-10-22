@@ -10,3 +10,8 @@ python-multipart==0.0.20
 email-validator==2.3.0
 pytest==8.3.4
 httpx==0.28.1
+scikit-learn==1.6.1
+numpy==2.2.3
+scipy==1.15.2
+joblib==1.4.2
+threadpoolctl==3.5.0

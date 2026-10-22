@@ -34,19 +34,22 @@ class StudentProfileCreate(BaseModel):
 
 class AssignmentCreate(BaseModel):
     classroom_id: str
-    subject: str
-    title: str
-    base_content: str
-    grades: list[int]
+    subject: str = Field(min_length=2, max_length=120)
+    title: str = Field(min_length=3, max_length=180)
+    base_content: str = Field(min_length=5, max_length=12000)
+    grades: list[int] = Field(min_length=1, max_length=6)
+
+class VariantUpdate(BaseModel):
+    content: str = Field(min_length=5, max_length=12000)
 
 class AttemptCreate(BaseModel):
-    id: str
+    id: str = Field(min_length=8, max_length=36)
     assignment_id: Optional[str] = None
-    question_key: str
-    answer: str
+    question_key: str = Field(min_length=1, max_length=100)
+    answer: str = Field(max_length=12000)
     is_correct: bool
-    hints_used: int = 0
-    response_time_seconds: float = 0
+    hints_used: int = Field(default=0, ge=0, le=1000)
+    response_time_seconds: float = Field(default=0, ge=0, le=604800, allow_inf_nan=False)
 
 class InterventionCreate(BaseModel):
     student_id: str
@@ -54,6 +57,8 @@ class InterventionCreate(BaseModel):
     notes: Optional[str] = None
 
 class TutorRequest(BaseModel):
-    message: str
-    subject: Optional[str] = None
-    topic: Optional[str] = None
+    message: str = Field(min_length=1, max_length=2000)
+    subject: Optional[str] = Field(default=None, max_length=120)
+    topic: Optional[str] = Field(default=None, max_length=180)
+    assignment_id: Optional[str] = Field(default=None, max_length=36)
+    hint_level: int = Field(default=0, ge=0, le=2)

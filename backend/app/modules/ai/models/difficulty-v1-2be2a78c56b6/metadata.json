@@ -1,0 +1,48 @@
+{
+  "abstention_threshold": 0.65,
+  "algorithm": "multinomial_nb",
+  "confidence_calibrated": false,
+  "dataset": {
+    "class_distribution": {
+      "ADVANCED": 15,
+      "BASIC": 15,
+      "INTERMEDIATE": 15
+    },
+    "duplicates_removed": 0,
+    "missing_values": {
+      "activity_type": 45,
+      "competency": 45,
+      "grade": 45,
+      "prerequisites": 45,
+      "subject": 45,
+      "topic": 45
+    },
+    "origin": "synthetic",
+    "rows": 45,
+    "sha256": "f28ed912e4d73f1207f04645f6e52a0fd92f86dd2897986ab7b16e8c2f1d8a32",
+    "sources": [
+      "KAWSAY technical fixture v1; no pedagogical approval"
+    ]
+  },
+  "limitations": "Synthetic technical fixture; probabilities are not calibrated; not validated for students.",
+  "numpy": "2.2.3",
+  "pedagogically_validated": false,
+  "python": "3.13.14",
+  "review_required": true,
+  "scikit_learn": "1.6.1",
+  "scipy": "1.15.2",
+  "seed": 42,
+  "sha256": "e077f57a18f5ae31e3ba4d6db728ec99ee19f7186c73abac898925e0bdb014d2",
+  "training_parameters": {
+    "logistic_C": 4,
+    "max_features": 8000,
+    "nb_alpha": 0.5,
+    "selection_metric": "f1_macro",
+    "split": [
+      0.6,
+      0.2,
+      0.2
+    ]
+  },
+  "version": "difficulty-v1-2be2a78c56b6"
+}

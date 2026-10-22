@@ -10,6 +10,7 @@ from app.core.database import check_database_connection
 from app.api import api
 from app.modules.auth.routes import router as auth_router
 from app.modules.sync.routes import router as sync_router
+from app.modules.ai.routes import router as ai_router
 logging.basicConfig(
     level=getattr(logging, settings.log_level.upper(), logging.INFO),
     format="%(asctime)s %(levelname)s %(name)s request_id=%(request_id)s %(message)s",
@@ -61,4 +62,5 @@ def readiness():
 
 app.include_router(auth_router, prefix="/api/v1")
 app.include_router(sync_router, prefix="/api/v1")
+app.include_router(ai_router, prefix="/api/v1")
 app.include_router(api)

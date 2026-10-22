@@ -19,10 +19,10 @@ class SyncEvent(BaseModel):
     client_event_id: str = Field(min_length=8, max_length=64)
     assignment_id: str | None = None
     question_key: str = Field(min_length=1, max_length=100)
-    answer: str
+    answer: str = Field(max_length=12000)
     is_correct: bool
-    hints_used: int = Field(default=0, ge=0)
-    response_time_seconds: float = Field(default=0, ge=0)
+    hints_used: int = Field(default=0, ge=0, le=1000)
+    response_time_seconds: float = Field(default=0, ge=0, le=604800, allow_inf_nan=False)
 
 
 class SyncBatchPayload(BaseModel):

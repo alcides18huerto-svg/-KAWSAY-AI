@@ -41,25 +41,36 @@ def sync_push(
     events = payload.events
     event_ids = [event.client_event_id for event in events]
 
-    already_synced = set(
+    already_synced = {
+        attempt.id: attempt for attempt in
         db.scalars(
-            select(LearningAttempt.id).where(LearningAttempt.id.in_(event_ids))
+            select(LearningAttempt).where(LearningAttempt.id.in_(event_ids))
         ).all()
-    )
+    }
 
     accepted: list[str] = []
     duplicates: list[str] = []
     rejected: list[RejectedEvent] = []
-    seen: set[str] = set()
+    seen: dict[str, dict] = {}
 
     for event in events:
         event_id = event.client_event_id
-        if event_id in seen or event_id in already_synced:
-            duplicates.append(event_id)
-            accepted.append(event_id)
+        values = event.model_dump(exclude={"client_event_id"})
+        existing = already_synced.get(event_id)
+        conflict = existing is not None and (
+            existing.student_id != user.id or any(getattr(existing, key) != value for key, value in values.items())
+        )
+        if event_id in seen and seen[event_id] != values:
+            conflict = True
+        if conflict:
+            rejected.append(RejectedEvent(client_event_id=event_id, reason="event_id_conflict"))
+            continue
+        if event_id in seen or existing is not None:
+            if event_id not in accepted:
+                duplicates.append(event_id)
+                accepted.append(event_id)
             continue
 
-        seen.add(event_id)
         try:
             with db.begin_nested():
                 db.add(
@@ -75,9 +86,11 @@ def sync_push(
                     )
                 )
             accepted.append(event_id)
+            seen[event_id] = values
         except IntegrityError:
-            duplicates.append(event_id)
-            accepted.append(event_id)
+            # FK violations are not successful duplicates. A concurrent duplicate
+            # is retried on the next push and then checked against its payload.
+            rejected.append(RejectedEvent(client_event_id=event_id, reason="integrity_conflict_retry"))
 
     try:
         db.commit()
