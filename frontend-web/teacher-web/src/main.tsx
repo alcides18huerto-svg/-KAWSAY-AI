@@ -202,8 +202,8 @@ function App() {
       setClassrooms(classroomRows); setSchools(schoolRows);
       if(!selectedClassroom&&classroomRows.length) setSelectedClassroom(classroomRows[0].id);
       if(!selectedSchool&&schoolRows.length) setSelectedSchool(schoolRows[0].id);
-    } catch (e) {
-      // ignore
+    } catch {
+      // Datos base opcionales: no bloquean el resto del panel.
     }
   }
 
@@ -268,19 +268,25 @@ function App() {
         try {
           const rows=await request<Student[]>("/teacher/students");
           if(guardSession(token)) setStudents(rows);
-        } catch (e) {}
+        } catch {
+          // Sección secundaria: se reintenta al navegar de nuevo.
+        }
       }
       if(next==="students") {
         try {
           const rows=await request<Student[]>("/teacher/students");
           if(guardSession(token)) setStudents(rows);
-        } catch (e) {}
+        } catch {
+          // Sección secundaria: se reintenta al navegar de nuevo.
+        }
       }
       if(next==="progress") {
         try {
           const rows=await request<ProgressStudent[]>("/teacher/progress");
           if(guardSession(token)) setProgress(rows);
-        } catch (e) {}
+        } catch {
+          // Sección secundaria: se reintenta al navegar de nuevo.
+        }
       }
       if(next==="flags") {
         try {
@@ -290,7 +296,9 @@ function App() {
           ]);
           if(!guardSession(token)) return;
           setFlags(flagRows); setStudents(studentRows);
-        } catch (e) {}
+        } catch {
+          // Sección secundaria: se reintenta al navegar de nuevo.
+        }
       }
       if(next==="interventions") {
         try {
@@ -302,13 +310,17 @@ function App() {
           setStudents(studentRows); setInterventions(interventionRows);
           if(focusStudentId) setInterventionStudent(focusStudentId);
           else if(!interventionStudent&&studentRows.length) setInterventionStudent(studentRows[0].id);
-        } catch (e) {}
+        } catch {
+          // Sección secundaria: se reintenta al navegar de nuevo.
+        }
       }
       if(next==="assignments") {
         try {
           const rows=await request<Assignment[]>("/teacher/assignments");
           if(guardSession(token)) setAssignments(rows);
-        } catch (e) {}
+        } catch {
+          // Sección secundaria: se reintenta al navegar de nuevo.
+        }
       }
       if(next==="create") await loadBase();
     } catch(error) {
@@ -322,7 +334,6 @@ function App() {
     // Al iniciar sesión solo se carga el resumen (que ya trae actividades,
     // progreso, alertas e intervenciones); las demás vistas se cargan al navegar.
     void loadView("dashboard");
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   },[logged]);
 
   async function runAction(action:()=>Promise<void>,successMessage?:string) {
