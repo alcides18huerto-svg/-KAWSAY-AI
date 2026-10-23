@@ -4,7 +4,7 @@
 # ── Settings del servicio web (KAWSAY-AI) ─────────────────────────
 #   Language / Runtime :  Python 3  (NO Docker)
 #   Root Directory     :  backend
-#   Build Command      :  pip install -r requirements.txt
+#   Build Command      :  pip install -r requirements.txt && alembic upgrade head
 #   Start Command      :  uvicorn app.main:app --host 0.0.0.0 --port $PORT
 #   Health Check Path  :  /health        (existe en app/main.py; también hay /ready)
 #
@@ -21,8 +21,9 @@
 # ── Notas importantes ─────────────────────────────────────────────
 # 1. El proyecto es FastAPI + Uvicorn, NO Flask. Por eso el comando de
 #    arranque es "uvicorn app.main:app" y NO "gunicorn app:app".
-# 2. requirements.txt ya existe en backend/ (fastapi, uvicorn, sqlalchemy,
-#    psycopg, etc.) — no necesitas crearlo ni agregar flask/gunicorn.
+# 2. El build instala requirements.txt y ejecuta `alembic upgrade head` antes
+#    de iniciar Uvicorn, para crear o actualizar las tablas de PostgreSQL.
+#    requirements.txt ya existe en backend/ — no agregues flask/gunicorn.
 # 3. Si antes Render detectó "Docker", fue porque backend/Dockerfile existe.
 #    Al cambiar Runtime a Python y Root Directory a "backend", se ignora.
 # 4. Tras guardar cambios: Events → "Manual Deploy" →
