@@ -102,6 +102,15 @@
     font-variant-numeric: tabular-nums;
   }
 
+  /* Navegación móvil: se desplaza en horizontal sin barra visible. */
+  .scrollbar-none {
+    scrollbar-width: none;
+  }
+
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .motion-safe\:transition-none {
       transition: none !important;

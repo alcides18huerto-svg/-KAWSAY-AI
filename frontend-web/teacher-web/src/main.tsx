@@ -85,7 +85,7 @@ function Login({done}:{done:()=>void}) {
     finally { setBusy(false); }
   }
   return <div className="grid min-h-screen place-items-center bg-gradient-to-br from-kawsay-50 via-canvas to-kawsay-100 p-4">
-    <form className="motion-safe:transition-none w-full max-w-[430px] rounded-2xl border border-line bg-surface p-8 shadow-raised" onSubmit={submit}>
+    <form className="motion-safe:transition-none w-full max-w-[430px] rounded-2xl border border-line bg-surface p-6 shadow-raised sm:p-8" onSubmit={submit}>
       <div className="mb-7 flex items-center gap-3">
         <span className="grid size-11 place-items-center rounded-xl bg-kawsay-600 text-lg font-black text-white shadow-card">K</span>
         <div>
@@ -449,25 +449,28 @@ function App() {
   };
 
   return <div className="grid min-h-screen grid-cols-1 lg:grid-cols-[272px_1fr]">
-    <aside className="flex flex-col bg-kawsay-900 p-4 text-white lg:sticky lg:top-0 lg:h-screen lg:overflow-y-auto lg:p-6">
-      <div className="mb-6 flex items-center gap-3 px-1">
-        <span className="grid size-10 shrink-0 place-items-center rounded-xl bg-kawsay-500 text-base font-black shadow-card">K</span>
-        <div>
-          <h2 className="text-base font-bold leading-tight tracking-tight">KAWSAY AI</h2>
-          <span className="text-xs text-kawsay-300">Panel docente</span>
+    <aside className="sticky top-0 z-30 flex flex-col bg-kawsay-900 px-3 py-2.5 text-white shadow-raised lg:static lg:h-screen lg:overflow-y-auto lg:p-6 lg:shadow-none">
+      <div className="flex items-center justify-between gap-3 lg:mb-6 lg:px-1">
+        <div className="flex items-center gap-2.5 lg:gap-3">
+          <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-kawsay-500 text-sm font-black shadow-card lg:size-10 lg:text-base">K</span>
+          <div>
+            <h2 className="text-sm font-bold leading-tight tracking-tight lg:text-base">KAWSAY AI</h2>
+            <span className="hidden text-xs text-kawsay-300 sm:block">Panel docente</span>
+          </div>
         </div>
+        <button className="rounded-lg border border-white/15 px-3 py-1.5 text-xs font-semibold text-kawsay-200 transition hover:bg-white/10 hover:text-white lg:hidden" onClick={()=>{sessionRef.current++; localStorage.removeItem("token"); setLogged(false);}}>Salir</button>
       </div>
 
-      <nav aria-label="Secciones del panel" className="flex flex-1 flex-col gap-6">
-        {NAV_GROUPS.map(group=><div key={group.label}>
-          <h3 className="mb-2 px-3 text-[11px] font-bold uppercase tracking-wider text-kawsay-400">{group.label}</h3>
-          <ul className="space-y-1">
-            {group.items.map(([key,label,icon])=><li key={key}>
+      <nav aria-label="Secciones del panel" className="scrollbar-none -mx-1 mt-2 flex gap-1 overflow-x-auto px-1 pb-1 lg:mx-0 lg:mt-0 lg:flex-1 lg:flex-col lg:gap-6 lg:overflow-visible lg:px-0 lg:pb-0">
+        {NAV_GROUPS.map(group=><div key={group.label} className="contents lg:block">
+          <h3 className="hidden lg:mb-2 lg:block lg:px-3 lg:text-[11px] lg:font-bold lg:uppercase lg:tracking-wider lg:text-kawsay-400">{group.label}</h3>
+          <ul className="contents lg:block lg:space-y-1">
+            {group.items.map(([key,label,icon])=><li key={key} className="shrink-0 lg:block">
               <button
-                className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-medium transition ${view===key?"bg-kawsay-600 text-white shadow-card":"text-kawsay-200 hover:bg-white/10 hover:text-white"}`}
+                className={`flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-left text-xs font-semibold transition lg:w-full lg:gap-3 lg:rounded-xl lg:py-2.5 lg:text-sm lg:font-medium ${view===key?"bg-kawsay-600 text-white shadow-card":"text-kawsay-200 hover:bg-white/10 hover:text-white"}`}
                 aria-current={view===key?"page":undefined}
                 onClick={()=>void loadView(key)}>
-                <span aria-hidden className={`grid size-6 shrink-0 place-items-center rounded-lg text-xs ${view===key?"bg-white/20":"bg-white/5"}`}>{icon}</span>
+                <span aria-hidden className={`hidden size-6 shrink-0 place-items-center rounded-lg text-xs sm:grid ${view===key?"bg-white/20":"bg-white/5"}`}>{icon}</span>
                 <span>{label}</span>
               </button>
             </li>)}
@@ -475,7 +478,7 @@ function App() {
         </div>)}
       </nav>
 
-      <div className="mt-6 border-t border-white/10 pt-4">
+      <div className="mt-4 hidden border-t border-white/10 pt-4 lg:mt-6 lg:block">
         <dl className="mb-4 grid w-full grid-cols-2 gap-2 px-1">
           <div>
             <dt className="text-[11px] font-medium uppercase tracking-wide text-kawsay-400">Aulas</dt>
@@ -490,10 +493,10 @@ function App() {
       </div>
     </aside>
 
-    <main className="w-full max-w-[1400px] p-5 lg:p-9">
-      <header className="mb-7 flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
+    <main className="w-full max-w-[1400px] p-4 sm:p-5 lg:p-9">
+      <header className="mb-5 flex flex-wrap items-end justify-between gap-4 border-b border-line pb-4 sm:mb-7 sm:pb-5">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight text-ink lg:text-[28px]">{viewTitles[view]}</h1>
+          <h1 className="text-xl font-bold tracking-tight text-ink sm:text-2xl lg:text-[28px]">{viewTitles[view]}</h1>
           <p className="mt-1 text-sm text-ink-soft">{viewHints[view]}</p>
         </div>
       </header>
