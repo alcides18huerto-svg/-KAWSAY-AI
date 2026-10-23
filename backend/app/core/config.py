@@ -1,5 +1,5 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from pydantic import Field
+from pydantic import Field, field_validator
 class Settings(BaseSettings):
     app_env: str = "development"
     database_url: str = Field(
@@ -16,6 +16,16 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
     request_timeout_seconds: float = 30.0
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
+
+    @field_validator("database_url")
+    @classmethod
+    def normalize_database_url(cls, value: str) -> str:
+        """Use the installed psycopg 3 driver with Render/Heroku style URLs."""
+        if value.startswith("postgres://"):
+            value = "postgresql+psycopg://" + value[len("postgres://"):]
+        elif value.startswith("postgresql://"):
+            value = "postgresql+psycopg://" + value[len("postgresql://"):]
+        return value
 
     @property
     def cors_list(self) -> list[str]:
