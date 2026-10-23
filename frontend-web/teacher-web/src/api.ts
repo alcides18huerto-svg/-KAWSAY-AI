@@ -18,7 +18,7 @@ if (!import.meta.env.DEV && !import.meta.env.VITE_API_URL) {
 }
 
 /** Abort pending requests so a sleeping/cold backend cannot hang the UI forever. */
-const REQUEST_TIMEOUT_MS = 20_000;
+const REQUEST_TIMEOUT_MS = 60_000;
 
 export async function request<T = unknown>(
   path: string,
