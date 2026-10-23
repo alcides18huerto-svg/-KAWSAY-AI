@@ -1,5 +1,9 @@
 # Evidencia de implementación y verificación
 
+**Actualización posterior:** se habilitó Docker Desktop, PostgreSQL real y autenticación HTTP.
+La comprobación del servidor y las 41 pruebas posteriores están en [live-server.md](live-server.md).
+Los bloqueos de Docker/PostgreSQL descritos más abajo corresponden a la primera ejecución.
+
 Fecha de sesión: 22 de octubre de 2026. Rama: `feature/entrenamiento-ia`.
 Entorno probado: Windows, Python 3.13.14, venv aislado fuera del repositorio.
 

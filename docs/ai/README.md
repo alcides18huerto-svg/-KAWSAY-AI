@@ -1,5 +1,8 @@
 # Módulo IA de KAWSAY-AI
 
+Ejecución posterior del servidor local con PostgreSQL real, autenticación y clasificación HTTP:
+[live-server.md](live-server.md).
+
 ## Alcance implementado
 
 - Pipeline interno CSV/JSON → validación → limpieza → partición agrupada 60/20/20 →

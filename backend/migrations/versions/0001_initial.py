@@ -1,8 +1,8 @@
-"Initial KAWSAY schema.
+"""Initial KAWSAY schema.
 
 Revision ID: 0001_initial
 Revises:
-""
+"""
 from alembic import op
 import sqlalchemy as sa
 revision = "0001_initial"
