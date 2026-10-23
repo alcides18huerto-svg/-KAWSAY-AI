@@ -1,7 +1,10 @@
 import logging
+import subprocess
+import sys
 import time
 import uuid
 from contextlib import asynccontextmanager
+from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -15,10 +18,47 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(name)s request_id=%(request_id)s %(message)s",
 )
 logger = logging.getLogger("kawsay.api")
+BACKEND_DIR = Path(__file__).resolve().parent.parent
+
+
+def run_migrations(max_attempts: int = 10, delay_seconds: float = 3.0) -> None:
+    """Apply Alembic migrations once the database is reachable.
+
+    Render may still be provisioning the database when the web service starts,
+    so retry the connection instead of failing on the first attempt.
+    """
+    command = [sys.executable, "-m", "alembic", "upgrade", "head"]
+    for attempt in range(1, max_attempts + 1):
+        result = subprocess.run(
+            command,
+            cwd=BACKEND_DIR,
+            capture_output=True,
+            text=True,
+        )
+        if result.returncode == 0:
+            logger.info("Database migrations applied", extra={"request_id": "startup"})
+            return
+        output = (result.stderr or result.stdout or "").strip().splitlines()
+        detail = output[-1] if output else f"exit code {result.returncode}"
+        logger.warning(
+            "Migration attempt %s/%s failed: %s",
+            attempt,
+            max_attempts,
+            detail,
+            extra={"request_id": "startup"},
+        )
+        if attempt < max_attempts:
+            time.sleep(delay_seconds)
+    raise RuntimeError(
+        "No se pudieron aplicar las migraciones. Verifica DATABASE_URL "
+        "(en Render usa la Internal Database URL)."
+    )
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     logger.info("KAWSAY backend starting", extra={"request_id": "startup"})
+    if settings.run_migrations_on_startup:
+        run_migrations()
     yield
     logger.info("KAWSAY backend stopping", extra={"request_id": "shutdown"})
 

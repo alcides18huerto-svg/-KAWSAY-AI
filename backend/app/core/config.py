@@ -15,6 +15,7 @@ class Settings(BaseSettings):
     ai_model: str = "gpt-4o-mini"
     log_level: str = "INFO"
     request_timeout_seconds: float = 30.0
+    run_migrations_on_startup: bool = True
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
     @field_validator("database_url")
@@ -34,6 +35,10 @@ class Settings(BaseSettings):
     def validate_database(self) -> None:
         if not self.database_url.startswith("postgresql"):
             raise ValueError("DATABASE_URL debe apuntar a PostgreSQL; SQLite no es base central válida")
+        if "@localhost" in self.database_url or "@127.0.0.1" in self.database_url:
+            raise ValueError(
+                "DATABASE_URL apunta a localhost; en Render configura la Internal Database URL del servicio PostgreSQL"
+            )
 
 settings = Settings()
 if settings.app_env == "production":
