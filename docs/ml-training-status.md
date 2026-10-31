@@ -1,7 +1,7 @@
 # KAWSAY AI · Estado verificable del entrenamiento (28-10-2026)
 
 ## Resultado actual
-- **Entrenamiento ejecutado:** GitHub Actions run [40777600164](https://github.com/Yosep646/KAWSAY/actions/runs/40777600164).
+- **Entrenamiento ejecutado:** GitHub Actions (run 40777600164, repositorio anterior de KAWSAY).
 - Datos: **SYNTHETIC**, 1.000 estudiantes simulados (semilla 7), NUNCA información de niños reales.
 - Protocolo: 10 ejercicios cerrados para predecir dificultad en los próximos 5, partición **POR ESTUDIANTE** 80 % desarrollo / 20 % test; CV agrupada y calibración con pliegues agrupados; control de fuga; baselines; informe y ficha del modelo.
 - Resultado: se generaron `ml/models/*.joblib`, `ml/reports/*.json`, la ficha `docs/ml-model-card.md` y el registro `ml/registry/registry.json` **como artefacto descargable de la ejecución**, almacenado por GitHub Actions durante 30 días; no se versionaron datos de estudiantes.

@@ -1,6 +1,6 @@
 # KAWSAY AI
 
-**Autor: Yosep** · Plataforma educativa adaptativa, offline-first y multigrado para aulas rurales.
+**Autor: Max** · Plataforma educativa adaptativa, offline-first y multigrado para aulas rurales.
 Foco del hackathon: **Reto 10 — tecnología que encuentre a quien estamos dejando atrás**: detectar, con evidencia explicable, qué estudiantes
 necesitan apoyo y en qué competencia, también donde Internet no siempre llega. KAWSAY **no reemplaza al docente**: el currículo define qué se
 aprende, el docente decide qué publicar, y KAWSAY adapta cómo.
@@ -44,4 +44,4 @@ E2E en Chromium (instalación y ejecución): `docs/16-testing.md`; comando desde
 - No hay currículo oficial cargado (solo datos DEMO), ni revisión legal de datos de menores.
 - SQLite admite un solo escritor: válido para un piloto en un servidor; ver `docs/06-database-design.md` para los límites.
 
-Licencia: por definir por el autor (Yosep).
+Licencia: por definir por el autor (Max).

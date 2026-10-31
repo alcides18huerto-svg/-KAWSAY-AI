@@ -1,5 +1,5 @@
 # ADR-010 · SQLite como base de datos del servidor
-**Estado:** Aceptado (decisión del autor, Yosep). **Reemplaza a ADR-003 (PostgreSQL).**
+**Estado:** Aceptado (decisión del autor, Max). **Reemplaza a ADR-003 (PostgreSQL).**
 ## Contexto
 El proyecto debe poder descomprimirse y ejecutarse en VS Code sin instalar ni administrar un servidor de base de datos, y la app móvil ya usa SQLite.
 ## Decisión

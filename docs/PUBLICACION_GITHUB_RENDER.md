@@ -1,6 +1,6 @@
 # Publicar una versión separada en GitHub y Render
 
-La cuenta de Render ya tiene servicios anteriores de KAWSAY AI conectados al repositorio `alcides18huerto-svg/-KAWSAY-AI`. La cuenta GitHub autenticada en ChatGPT es `Yosep646` y tiene acceso de escritura reportado al repositorio, pero esta entrega **no reemplaza main ni las URL anteriores**.
+La cuenta de Render tiene servicios de KAWSAY AI conectados al repositorio `alcides18huerto-svg/-KAWSAY-AI`. La rama `main` ya contiene el refactor de tres paneles y el despliegue usa `render.yaml` desde la raíz.
 
 ## GitHub
 
@@ -24,7 +24,7 @@ Después de que el push termine, crea un **nuevo** servicio Docker Free, con:
 - JWT_SECRET: secreto privado aleatorio de 32+ caracteres.
 - APP_ENV: production
 - DATABASE_URL: sqlite:////srv/data/kawsay.db
-- AI_PROVIDER: disabled
+- AI_PROVIDER: local
 
 **Atención:** demo con datos ficticios únicamente. SQLite es efímero en Render Free; no subir alumnos reales. Esta receta no demuestra el build hasta que el servicio haya compilado y arrancado de verdad.
 

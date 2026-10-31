@@ -67,11 +67,11 @@ def test_cors_allows_only_configured_origins(monkeypatch):
     assert "access-control-allow-origin" not in bad.headers
 
 
-@pytest.mark.parametrize("pw", ["corta", "password1234", "aaaaaaaaaaaa", "una-clave-larga-123".replace("una", "yosep")])
+@pytest.mark.parametrize("pw", ["corta", "password1234", "aaaaaaaaaaaa", "una-clave-larga-123".replace("una", "max")])
 def test_password_policy_rejects_weak_passwords(pw):
-    if pw.startswith("yosep"):
+    if pw.startswith("max"):
         with pytest.raises(WeakPassword):
-            check_password_policy(pw, email="yosep@x.pe")                         # contiene la parte local del correo
+            check_password_policy(pw, email="max@x.pe")                           # contiene la parte local del correo
     else:
         with pytest.raises(WeakPassword):
             check_password_policy(pw)

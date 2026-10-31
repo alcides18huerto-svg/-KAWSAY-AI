@@ -1,7 +1,7 @@
 ﻿# 00 · Auditoría del repositorio (estado real al cierre)
 
 Clasificación: **IMPLEMENTED** (código + pruebas ejecutadas) · **PARTIAL** · **UNVERIFIED** (escrito, no ejecutado) · **PLANNED** · **BLOCKED**.
-Regla: nada se marca IMPLEMENTED sin una verificación ejecutada. Autor: Yosep.
+Regla: nada se marca IMPLEMENTED sin una verificación ejecutada. Autor: Max.
 
 ## Verificaciones ejecutadas en el cierre
 | Verificación | Resultado |

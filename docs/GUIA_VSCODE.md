@@ -1,6 +1,6 @@
 # Guía para ejecutar KAWSAY AI en VS Code
 
-Para: **Yosep**. Tiempo: ~5 minutos. No necesitas instalar ninguna base de datos (SQLite viene con Python).
+Para: **Max**. Tiempo: ~5 minutos. No necesitas instalar ninguna base de datos (SQLite viene con Python).
 
 ## Requisitos
 | Programa | Versión | Para qué |

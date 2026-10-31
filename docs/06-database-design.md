@@ -1,6 +1,6 @@
 # 06 · Diseño de base de datos (SQLite)
 
-Decisión del autor (Yosep): **la base de datos es SQLite** (ADR-010). El esquema real está en `backend/migrations/versions/*_0001_*.py`
+Decisión del autor (Max): **la base de datos es SQLite** (ADR-010). El esquema real está en `backend/migrations/versions/*_0001_*.py`
 y el diagrama ER se genera desde los modelos (`07-er-diagram.md`). Aquí se explican las decisiones, no se repite la lista de columnas.
 
 ## Cómo está configurada SQLite
