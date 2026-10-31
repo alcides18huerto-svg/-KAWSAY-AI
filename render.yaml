@@ -20,7 +20,11 @@ services:
         value: ""
       - key: JWT_SECRET
         sync: false
+      - key: KAWSAY_AUTO_MIGRATE
+        value: "1"
       - key: KAWSAY_DEMO_SEED
+        value: "1"
+      - key: KAWSAY_DEMO_SEED_IN_APP
         value: "1"
       - key: KAWSAY_DEMO_BOOTSTRAP
         value: "1"

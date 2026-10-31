@@ -163,8 +163,9 @@ for n, k in kids.items():
 
 step("9. Intervención docente registrada (la evolución se mostrará sin afirmar causalidad)")
 f0 = flags[0]
-iv = ok(c.post("/interventions", headers=tch, json={"student_id": f0["student"]["id"], "competency_id": f0["competency"]["id"],
-                                                    "strategy": "Actividad guiada con material concreto", "support_flag_id": f0["id"]}), 201)
+iv = ok(c.post("/interventions", headers=tch, json={
+    "student_id": f0["student"]["id"], "competency_id": f0["competency"]["id"],
+    "strategy": "Actividad guiada con material concreto", "support_flag_id": f0["id"]}), 201)
 print("   intervención:", iv["id"], "| alerta ahora:", ok(c.get("/support-flags?status=ACKNOWLEDGED", headers=tch))[0]["status"])
 
 step("10. Controles de seguridad en vivo")

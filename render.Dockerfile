@@ -7,7 +7,7 @@ COPY teacher-web/ ./
 RUN npm run build
 
 FROM python:3.12-slim
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PYTHONUTF8=1 PYTHONIOENCODING=utf-8 PIP_NO_CACHE_DIR=1
 WORKDIR /srv
 RUN addgroup --system kawsay && adduser --system --ingroup kawsay kawsay
 COPY backend/requirements.txt ./requirements.txt

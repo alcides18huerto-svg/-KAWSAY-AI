@@ -11,6 +11,7 @@ from app.core.config import get_settings
 from app.core.exceptions import register_exception_handlers
 from app.core.logging import configure_logging
 from app.core.middleware import RequestContextMiddleware
+from app.core.startup import startup
 from app.modules.analytics.routes import router as analytics_router
 from app.modules.assignments.routes import router as assignments_router
 from app.modules.audit.routes import router as audit_router
@@ -41,6 +42,7 @@ def create_app() -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
+        startup()
         yield
 
     app = FastAPI(
