@@ -88,7 +88,8 @@ def demo() -> None:
         wait_ready()
         run([PY, ROOT / "scripts" / "demo_e2e.py"], env={
             "KAWSAY_URL": "http://127.0.0.1:8000", "KAWSAY_ADMIN_EMAIL": DEMO_ADMIN[0], "KAWSAY_ADMIN_PASSWORD": DEMO_ADMIN[1],
-            "KAWSAY_TEACHER_EMAIL": DEMO_TEACHER[0], "KAWSAY_TEACHER_PASSWORD": DEMO_TEACHER[1]})
+            "KAWSAY_TEACHER_EMAIL": DEMO_TEACHER[0], "KAWSAY_TEACHER_PASSWORD": DEMO_TEACHER[1],
+            "DEMO_ALLOW_WRITES": "1", "PYTHONIOENCODING": "utf-8"})
         print(f"""
 ================ DATOS DEMO CARGADOS ================
  Backend + documentación:  http://127.0.0.1:8000/docs
