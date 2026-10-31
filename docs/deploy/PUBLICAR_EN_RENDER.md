@@ -11,7 +11,7 @@
 3. Abre PowerShell dentro de `KAWSAY-AI` y ejecuta:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\SUBIR_A_KAWSAY.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\SUBIR_A_KAWSAY.ps1
 ```
 
 El script comprueba archivos y credenciales a través de Git, rechaza posibles secretos o bases de datos y se detiene si `main` ya contiene commits. No hace `force push`. **No necesitas crear otro repositorio.**

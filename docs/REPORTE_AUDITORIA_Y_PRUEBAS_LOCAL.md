@@ -11,12 +11,12 @@
 | `teacher-web/src/pages/StudentActivity.tsx` | Corregido error TS2345 del acceso al primer elemento de la cola y añadido bloqueo síncrono de envíos simultáneos. |
 | `docker-compose.yml` | Puertos de localhost seguros por defecto, `WEB_BIND_IP` para LAN opcional, volumen persistente para SQLite, nginx como punto de entrada, servicio de backend. |
 | `.env.example`, `.gitignore`, `.dockerignore` | Variables documentadas; secretos, bases de datos, entornos y dependencias excluidos de Git y del contexto Docker. El JWT debe generarse aleatoriamente. |
-| `scripts/run_local.sh`, `iniciar_kawsay_windows.ps1` | Inicio local con clave aleatoria, sin crear automáticamente una cuenta con contraseña pública de demostración. |
+| `scripts/run_local.sh`, `scripts/windows/iniciar_kawsay_windows.ps1` | Inicio local con clave aleatoria, sin crear automáticamente una cuenta con contraseña pública de demostración. |
 | `scripts/smoke_local_stack.py` | Verifica que las tres rutas web respondan, salud del backend, disponibilidad de BD y API protegida (requiere servidor levantado). |
 | `scripts/test_offline_browser.py` | Prueba en Chromium para la cola IndexedDB por alumno, ACK, contenido cacheado y shell PWA; no se pudo ejecutar aquí por bloqueo de la navegación del navegador. |
 | `scripts/demo_e2e.py` | Prohibida por defecto la creación de datos demo sin activación explícita y contraseña específica. |
 | `ml/reports/kawsay-diff-20261026203213-cce4aa.json` | Codificación Windows-1252 corregida a UTF-8 sin alterar la información histórica del modelo sintético. |
-| `README_DEPLOY_RAPIDO.md` | Guía completa para Windows, Linux, LAN y limitaciones de hosting gratuito. |
+| `docs/deploy/README_DEPLOY_RAPIDO.md` | Guía completa para Windows, Linux, LAN y limitaciones de hosting gratuito. |
 
 ## Resultados ejecutados en esta sesión
 
@@ -50,7 +50,7 @@
 ## Comandos de puesta en marcha (en la PC con Docker Desktop)
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\iniciar_kawsay_windows.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\windows\iniciar_kawsay_windows.ps1
 python scripts/smoke_local_stack.py
 # http://127.0.0.1:8080
 ```

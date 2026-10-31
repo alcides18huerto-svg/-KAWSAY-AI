@@ -1,6 +1,7 @@
 # KAWSAY AI: ejecuta frontend + backend + DB en Docker Desktop (sin instalar Node en Windows).
 $ErrorActionPreference = 'Stop'
-Set-Location $PSScriptRoot
+$ProjectRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+Set-Location -LiteralPath $ProjectRoot
 if (-not (Get-Command docker -ErrorAction SilentlyContinue)) { throw 'Instala e inicia Docker Desktop primero.' }
 & docker compose version
 if ($LASTEXITCODE -ne 0) { throw 'Docker Compose no esta disponible.' }
@@ -11,7 +12,7 @@ if (-not (Test-Path '.env')) {
     [System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($b)
     $secret = ([BitConverter]::ToString($b)).Replace('-', '').ToLowerInvariant()
     $content = "JWT_SECRET=$secret`nAPP_ENV=development`nWEB_BIND_IP=127.0.0.1`nAI_PROVIDER=local`n"
-    [System.IO.File]::WriteAllText((Join-Path $PSScriptRoot '.env'), $content, (New-Object System.Text.UTF8Encoding($false)))
+    [System.IO.File]::WriteAllText((Join-Path $ProjectRoot '.env'), $content, (New-Object System.Text.UTF8Encoding($false)))
     Write-Host 'Configuracion .env creada con JWT_SECRET aleatorio. NO compartir.' -ForegroundColor Yellow
 }
 & docker compose up -d --build backend teacher-web

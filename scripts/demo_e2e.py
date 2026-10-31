@@ -80,6 +80,9 @@ kids = {n: ok(c.post("/students", headers=tch, json={"display_name": n, "grade_i
                                                       "classroom_id": room["id"]}), 201)
         for n, g in (("Juan", 1), ("Ana", 2), ("María", 3))}
 print("   grados presentes:", ok(c.get(f"/classrooms/{room['id']}", headers=tch))["grades_present"])
+print("   accesos de estudiantes (pestaña Estudiante del login):")
+for n, k in kids.items():
+    print(f"     {n}: código {k['login_code']} · PIN {k['pin']}")
 
 step("4. Actividad base → 3 variantes (una por grado) → revisión docente → aprobación → publicación")
 a = ok(c.post("/assignments", headers=tch, json={
@@ -160,3 +163,11 @@ print("   estudiante → API docente:", c.get("/classrooms", headers=sess["Juan"
 print("   sin token → analítica:", c.get(f"/analytics/classrooms/{room['id']}/summary").status_code, "(esperado 401)")
 print("   docente ajeno/ID inventado → aula:", c.get(f"/classrooms/{uuid.uuid4()}", headers=tch).status_code, "(esperado 404)")
 print("\nOK: flujo completo ejecutado contra", BASE)
+print("""
+================ ACCESO AL PANEL ESTUDIANTE ================
+ En http://localhost:5173 abre el login y elige la pestaña "Estudiante".
+ Usa "Código y PIN" con cualquiera de estos accesos DEMO:
+""" + "\n".join(f"   {n}: código {k['login_code']} · PIN {k['pin']}" for n, k in kids.items()) + """
+ El panel del estudiante está en /estudiante (Mi inicio, cursos,
+ actividades y progreso). Estos datos son ficticios y solo para la demo.
+===========================================================""")

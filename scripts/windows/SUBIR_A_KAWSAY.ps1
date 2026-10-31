@@ -2,7 +2,7 @@
 # Ejecutar desde una extraccion limpia del ZIP con Git instalado y autenticado.
 $ErrorActionPreference = 'Stop'
 Set-StrictMode -Version Latest
-$ProjectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
+$ProjectRoot = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 Set-Location -LiteralPath $ProjectRoot
 $Repo = 'https://github.com/alcides18huerto-svg/-KAWSAY-AI.git'
 function Check([string]$phase) {

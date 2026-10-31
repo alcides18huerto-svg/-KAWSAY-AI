@@ -77,16 +77,9 @@ export function Login() {
     <section className="login-story" aria-label="Bienvenida a KAWSAY AI">
       <Brand />
       <div className="login-story-copy">
-        <span className="eyebrow">APRENDER · CRECER · ACOMPAÑAR</span>
         <h1><span className="login-heading-line">Más educación</span><span className="login-heading-line">para más</span><span className="login-heading-line login-highlight">comunidades.</span></h1>
-        <p>Herramientas digitales para docentes, estudiantes e instituciones educativas del Perú.</p>
-        <div className="login-values" aria-label="Nuestros valores">
-          <span><Icon name="book"/> Aprender</span>
-          <span><Icon name="leaf"/> Crecer</span>
-          <span><Icon name="students"/> Acompañar</span>
-        </div>
+        <p>Acceso para docentes, estudiantes e instituciones del Perú.</p>
       </div>
-      <p className="login-story-footer"><Icon name="book"/> <span>Educación adaptativa.<strong>Decisiones siempre humanas.</strong></span></p>
     </section>
 
     <section className="login-form-panel" aria-label="Acceso a la plataforma">
@@ -170,7 +163,6 @@ export function Login() {
         </form>
 
         <p className="login-help">¿Necesitas acceso? Contacta a la administración de tu institución.</p>
-        <div className="login-footnote"><Icon name="students"/> Educación que acompaña a cada comunidad</div>
       </div>
     </section>
   </main>;

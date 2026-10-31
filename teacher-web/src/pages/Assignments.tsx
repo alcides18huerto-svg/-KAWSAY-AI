@@ -15,9 +15,10 @@ export function AssignmentList() {
   const [localDraft] = useState(restoreExerciseDraft);
   const draftAvailable = Boolean(localDraft?.title.trim() || localDraft?.instructions.trim());
   return (
-    <div>
-      <h2>Actividades</h2>
-      <p><Link to="/actividades/nueva">+ Crear actividad</Link></p>
+    <div className="teacher-workflow">
+      <TeacherPageIntro kicker="DISEÑO PEDAGÓGICO · KAWSAY AI" title="Actividades" description="Revisa tus actividades y su estado de publicación." icon="tasks">
+        <Link to="/actividades/nueva"><Icon name="tasks"/> Crear actividad</Link>
+      </TeacherPageIntro>
       {draftAvailable && localDraft && <div className="teacher-local-draft">
         <div><strong>Ejercicio pendiente en este navegador</strong><span>Borrador temporal · no publicado</span></div>
         <p>{localDraft.title.trim() || "Sin título"} — {localDraft.instructions.slice(0,160)}</p>
@@ -152,7 +153,7 @@ export function CreateAssignment() {
 
   return <div className="teacher-workflow teacher-activities-page">
     <TeacherPageIntro kicker="DISEÑO PEDAGÓGICO · KAWSAY AI" title="Crear actividad" icon="tasks"
-      description="Prepara una actividad alineada al currículo de tu institución, con versiones diferenciadas para cada grado.">
+      description="Prepara una actividad alineada al currículo, con variantes por grado.">
       <Link to="/planificacion"><Icon name="book"/> Ver planificación</Link>
       <Link className="secondary" to="/aulas"><Icon name="classroom"/> Mis aulas</Link>
     </TeacherPageIntro>
@@ -164,9 +165,9 @@ export function CreateAssignment() {
     <ErrorBox message={rooms.error ?? active.error ?? grades.error ?? plans.error ?? err}/>
     <div className="teacher-flow-grid">
       <section className="teacher-flow-card">
-        <div className="teacher-flow-card-heading"><span><Icon name="tasks"/></span><div><h3>Preparar actividad por grados</h3><p>Completa los datos, elige el contenido y guarda un borrador para revisión.</p></div></div>
+        <div className="teacher-flow-card-heading"><span><Icon name="tasks"/></span><div><h3>Preparar actividad por grados</h3><p>Completa los datos, elige el contenido y guarda un borrador.</p></div></div>
         {rooms.loading ? <Loading/> : !rooms.data?.length ?
-          <div className="teacher-flow-empty"><Icon name="classroom"/><h3>Primero registra tu aula</h3><p>No se puede asignar una actividad sin indicar a qué aula pertenece.</p><Link to="/aulas"><Icon name="arrow"/> Crear aula</Link></div> :
+          <div className="teacher-flow-empty"><Icon name="classroom"/><h3>Primero registra tu aula</h3><p>Indica el aula a la que pertenece la actividad.</p><Link to="/aulas"><Icon name="arrow"/> Crear aula</Link></div> :
           <form className="teacher-flow-form" onSubmit={e=>void submit(e)}>
             <label className="wide">Aula o sección
               <select value={rid} onChange={e=>{setRoomId(e.target.value);setPicked({});}} required>
@@ -176,7 +177,6 @@ export function CreateAssignment() {
             {active.loading ? <div className="wide"><Loading/></div> : gradeIds.length===0 ?
               <div className="teacher-flow-empty wide" role="status">
                 <Icon name="book"/><h3>{active.data?.length ? "El plan activo no tiene temas para seleccionar" : "Falta activar una planificación curricular"}</h3>
-                <p>Tu título y tus instrucciones se conservarán como borrador en esta pestaña mientras completas los requisitos.</p>
                 {plans.loading ? <p>Consultando los planes de la institución…</p> :
                   <p>{hasSubmittedPlan ? "Hay una versión enviada a revisión: el administrador debe aprobarla y activarla." :
                     hasApprovedPlan ? "Hay una versión aprobada pendiente de activación por el administrador." :
@@ -209,7 +209,7 @@ export function CreateAssignment() {
               <label className="teacher-math-toggle">
                 <input type="checkbox" checked={mathAuto} onChange={e=>setMathAuto(e.target.checked)}/>
                 <span><strong>Adaptar Matemática según el grado (1.º–6.º)</strong>
-                  <small>Motor de reglas: funciona sin servicio de IA. No cambia el grado oficial del alumno.</small></span>
+                  <small>Motor de reglas; no cambia el grado oficial del alumno.</small></span>
               </label>
               {mathAuto && <div className="teacher-math-auto-controls">
                 <label>Grado del ejercicio original
@@ -222,38 +222,36 @@ export function CreateAssignment() {
                     placeholder="245 + 178" maxLength={36} required
                     aria-describedby="teacher-math-help"/>
                 </label>
-                <p id="teacher-math-help">Introduce una operación completa (+, −, × o ÷). En el grado de origen se conserva exactamente el ejemplo. El docente revisa cada variante antes de enviarla.</p>
+                <p id="teacher-math-help">Introduce una operación completa (+, −, × o ÷). Revisa cada variante antes de publicar.</p>
                 <button type="button" className="teacher-math-match" onClick={completeMatchingGrades} disabled={!sourceGrade || active.loading}>
                   <Icon name="check"/> Seleccionar grados con la misma competencia
                 </button>
                 {skippedGrades.length>0 && <p className="teacher-math-warning" role="status">
-                  Grados sin un tema de la misma competencia en la planificación activa: {skippedGrades.map(g=>g+".º").join(", ")}.
-                  No se crearán ejercicios para esos grados hasta completar y aprobar sus temas.
+                  Sin tema de la misma competencia en la planificación activa: {skippedGrades.map(g=>g+".º").join(", ")}.
                 </p>}
               </div>}
             </section>
             <fieldset className="teacher-flow-assignment-mode wide"><legend>Cómo preparar las variantes</legend>
               <label><input type="radio" name="activity-mode" checked={mode==="AI_ASSISTED"} onChange={()=>setMode("AI_ASSISTED")}/>
-                <span><strong>Asistido por KAWSAY AI</strong><small>Generación opcional; el docente revisa y aprueba cada grado. Requiere proveedor de IA habilitado.</small></span>
+                <span><strong>Asistido por KAWSAY AI</strong><small>Generación opcional; revisa y aprueba cada grado.</small></span>
               </label>
               <label><input type="radio" name="activity-mode" checked={mode==="MANUAL"} onChange={()=>setMode("MANUAL")}/>
-                <span><strong>Creación manual</strong><small>Redacta las preguntas y adapta el contenido de cada grado directamente.</small></span>
+                <span><strong>Creación manual</strong><small>Redacta las preguntas de cada grado.</small></span>
               </label>
             </fieldset>
             {!ready && <p className="teacher-activity-missing wide" role="status"><Icon name="book"/> {missingReason}</p>}
-            {(title.trim() || instructions.trim()) && <p className="teacher-activity-autosave wide">El ejercicio escrito se conserva temporalmente en esta pestaña. No se ha enviado a los estudiantes.</p>}
             <button type="submit" disabled={!ready||busy}>{busy?"Guardando…":"Crear variantes para revisión"} <Icon name="arrow"/></button>
           </form>}
       </section>
       <aside className="teacher-flow-next">
-        <div className="teacher-flow-card-heading"><span><Icon name="leaf"/></span><div><h3>Cómo funciona KAWSAY</h3><p>Secuencia pedagógica segura por grado.</p></div></div>
+        <div className="teacher-flow-card-heading"><span><Icon name="leaf"/></span><div><h3>Cómo funciona KAWSAY</h3><p>Secuencia pedagógica por grado.</p></div></div>
         <ol className="teacher-flow-steps">
-          <li><span>1</span><div><strong>Currículo activo</strong><p>Cada tema corresponde a una unidad revisada por tu institución.</p></div></li>
-          <li><span>2</span><div><strong>Versiones por grado</strong><p>Una misma actividad puede adaptarse a 1.º, 2.º, 3.º y otros grados.</p></div></li>
-          <li><span>3</span><div><strong>Revisión humana</strong><p>Revisa, corrige y aprueba antes de publicar ejercicios.</p></div></li>
-          <li><span>4</span><div><strong>Seguimiento</strong><p>Las respuestas generan indicadores y recomendaciones de refuerzo; todavía no cambian automáticamente de grado.</p></div></li>
+          <li><span>1</span><div><strong>Currículo activo</strong><p>Cada tema proviene de una unidad revisada.</p></div></li>
+          <li><span>2</span><div><strong>Versiones por grado</strong><p>Una actividad se adapta a varios grados.</p></div></li>
+          <li><span>3</span><div><strong>Revisión humana</strong><p>Revisa y aprueba antes de publicar.</p></div></li>
+          <li><span>4</span><div><strong>Seguimiento</strong><p>Las respuestas generan indicadores; el grado no cambia automáticamente.</p></div></li>
         </ol>
-        <div className="teacher-flow-guidance">El grado oficial no cambia aunque se recomienden ejercicios de refuerzo. La reducción automática entre grados sigue pendiente de implementar y validar.</div>
+        <div className="teacher-flow-guidance">El grado oficial no cambia con las recomendaciones de refuerzo.</div>
       </aside>
     </div>
   </div>;
@@ -282,14 +280,14 @@ export function AssignmentReview() {
   return (
     <div>
       <h2>{a.data.title} <Badge tone={published ? "ok" : "info"}>{a.data.status}</Badge></h2>
-      <p className="muted">Flujo: KAWSAY propone → tú revisas → editas → apruebas → publicas. Nada llega a los estudiantes sin tu aprobación.</p>
+      <p className="muted">KAWSAY propone; tú revisas, apruebas y publicas.</p>
       <ErrorBox message={err ?? a.error} />
       {info && <p role="status" className="notice">{info}</p>}
       {!published && a.data.mode === "AI_ASSISTED" && (
         <Card title="Adaptación con KAWSAY AI">
           <label>Restricciones (opcional)<input value={constraints} onChange={(e) => setConstraints(e.target.value)} maxLength={1000} placeholder="p. ej., usar ejemplos de chacra" /></label>
           <button onClick={() => void adapt()}>ADAPTAR CON KAWSAY AI</button>
-          <p className="muted">Si la IA no está disponible, puedes escribir las variantes manualmente; el resto del sistema sigue funcionando.</p>
+          <p className="muted">Si la IA no está disponible, escribe las variantes manualmente.</p>
         </Card>)}
       {a.data.variants.map((v) => <VariantEditor key={v.id} assignmentId={id} v={v} grade={grades.data?.find((g) => g.id === v.grade_id)} locked={published} onChanged={() => void a.reload()} />)}
       {!published && <button onClick={() => void publish()} disabled={a.data.variants.some((v) => v.status !== "APPROVED")}>PUBLICAR (todas las variantes aprobadas)</button>}

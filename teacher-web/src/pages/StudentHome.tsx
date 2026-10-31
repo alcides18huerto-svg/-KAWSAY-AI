@@ -63,7 +63,7 @@ export function StudentHome({ focus = "home" }: { focus?: "home" | "activities" 
       await offlineTasks.save(user.id, visibleTasks);
       const updated = await offlineTasks.list(user.id);
       setSaved(updated);
-      setSyncMessage(`${updated.length} actividades disponibles en este dispositivo. Para responder sin Internet, abre una actividad mientras tengas conexión para descargar sus preguntas.`);
+      setSyncMessage(`${updated.length} actividades guardadas en este dispositivo.`);
     } catch (error) { setOfflineMessage(errMsg(error)); } finally { setSyncBusy(false); }
   };
   const [page, setPage] = useState<Pull | null>(null);
@@ -85,7 +85,7 @@ export function StudentHome({ focus = "home" }: { focus?: "home" | "activities" 
     <header className="student-welcome">
       <div className="student-hero-content"><p className="eyebrow"><Icon name="spark" /> MI ESPACIO DE APRENDIZAJE</p>
         <h2>{focus === "home" ? `¡Hola, ${user?.display_name}!` : focus === "activities" ? "Mis actividades" : focus === "courses" ? "Mis cursos" : "Mi progreso"}</h2>
-        <p>{focus === "home" ? "Cada día puedes descubrir algo nuevo. ¡Sigue aprendiendo a tu ritmo!" : focus === "activities" ? "Revisa los ejercicios que tu docente preparó para ti." : focus === "courses" ? "Accede a las áreas de tu grado y resuelve las actividades del maestro." : "Reconoce tus logros y descubre lo que puedes seguir practicando."}</p>
+        <p>{focus === "home" ? "Aprende a tu ritmo." : focus === "activities" ? "Ejercicios preparados por tu docente." : focus === "courses" ? "Áreas de tu grado y sus actividades." : "Tus logros y lo que puedes seguir practicando."}</p>
         <Link to={focus === "courses" ? "/estudiante/actividades" : "/estudiante/cursos"} className="student-hero-link">{focus === "courses" ? "Ver mis actividades" : "Ver mis cursos"} <Icon name="arrow" /></Link>
       </div>
       <div className="student-hero-decoration" aria-hidden="true"><span className="student-sun"/><span className="student-mountain m1"/><span className="student-mountain m2"/><span className="student-student-icon"><Icon name="graduation"/></span></div>
@@ -104,11 +104,11 @@ export function StudentHome({ focus = "home" }: { focus?: "home" | "activities" 
       </div>
       <div className="student-quick-links"><Link to="/estudiante/cursos"><Icon name="book" /> Ver mis cursos <Icon name="arrow"/></Link><Link to="/estudiante/actividades"><Icon name="book" /> Ver mis actividades <Icon name="arrow"/></Link><Link to="/estudiante/progreso"><Icon name="chart" /> Consultar mi progreso <Icon name="arrow"/></Link></div>
     </>}
-    <p className="notice" role="note">Puedes responder actividades descargadas sin conexión. Cada respuesta se conserva localmente y se confirma al volver a comunicarse con el servidor. Evita eliminar los datos del navegador antes de sincronizar.</p>
+    <p className="notice" role="note">Puedes responder actividades descargadas sin conexión. Tus respuestas se sincronizan al volver Internet.</p>
     {offlineMessage && <p role="alert" className="notice warn">{offlineMessage}</p>}
     <div className="student-columns">
       {focus === "courses" && <Card title="Cursos de mi aula">
-        <p>Estas áreas provienen de la planificación activa de tu institución y tu grado. Puedes consultar los cursos guardados sin Internet.</p>
+        <p>Áreas de la planificación activa de tu institución.</p>
         <button type="button" className="ghost" onClick={() => { void courses.reload(); void tasks.reload(); }} disabled={courses.loading || tasks.loading}>Actualizar cursos y actividades</button>
         {courses.error && <p className="notice warn" role="status">No se pudo actualizar el catálogo. Se muestran los cursos guardados en este dispositivo, si existen.</p>}
         {courses.loading && !savedCourses.length ? <Loading /> : <div className="student-courses-grid">
@@ -125,10 +125,10 @@ export function StudentHome({ focus = "home" }: { focus?: "home" | "activities" 
               )}</ul>}
             </section>;
           })}
-          {!courseCatalog.length && !priorTasks.length && <p>Aún no tienes cursos en una planificación activa. Cuando tu institución la publique y te conectes, los encontrarás aquí.</p>}
+          {!courseCatalog.length && !priorTasks.length && <p>Aún no tienes cursos activos. Aparecerán cuando tu institución publique la planificación.</p>}
           {priorTasks.length > 0 && <section className="student-course-card" aria-label="Actividades descargadas anteriormente">
             <h3>Actividades descargadas anteriormente</h3>
-            <p>Siguen disponibles aunque haya cambiado la planificación de tu escuela.</p>
+            <p>Disponibles aunque cambie la planificación.</p>
             <ul className="student-course-activities">{priorTasks.map(task =>
               <li key={task.student_assignment_id}><Link to={`/estudiante/actividad/${task.student_assignment_id}`}>{task.title} <Icon name="arrow"/></Link></li>
             )}</ul>
@@ -144,7 +144,7 @@ export function StudentHome({ focus = "home" }: { focus?: "home" | "activities" 
         {(page ?? tasks.data)?.has_more && <button className="ghost" disabled={busy} onClick={() => void loadMore()}>{busy ? "Cargando…" : "Ver más actividades"}</button>}
       </Card>}
       {focus !== "activities" && focus !== "courses" && <Card title="Mi progreso">
-        {progress.error ? <p role="status" className="notice warn">No se pudo actualizar tu progreso. Vuelve a consultar cuando tengas conexión con el servidor.</p> : null}
+        {progress.error ? <p role="status" className="notice warn">No se pudo actualizar tu progreso. Intenta de nuevo con conexión.</p> : null}
         {progress.loading ? <Loading /> : progress.data && (progress.data.length ? <ul className="student-task-list">{progress.data.map(p => <li key={p.competency} className="student-progress-item"><strong>{p.competency}</strong><span>{p.percent === null ? "Aún estamos reuniendo información" : `${p.percent} % de progreso`}</span>{p.percent !== null && Number.isFinite(p.percent) && <div className="student-progress-track" role="progressbar" aria-label={`Progreso de ${p.competency}`} aria-valuemin={0} aria-valuemax={100} aria-valuenow={Math.max(0,Math.min(100,p.percent))}><span style={{width:`${Math.max(0,Math.min(100,p.percent))}%`}}/></div>}</li>)}</ul> : <p>Tu progreso aparecerá cuando completes actividades.</p>)}
       </Card>}
     </div>

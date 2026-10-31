@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { FlagCard } from "../components/FlagCard";
+import { TeacherPageIntro } from "../components/TeacherPageIntro";
 import { ErrorBox, Loading } from "../components/ui";
 import { useAsync } from "../hooks/useAsync";
 import { api } from "../services/api";
@@ -11,9 +12,8 @@ export function Alerts() {
   const [status, setStatus] = useState("");
   const flags = useAsync(() => api.get<SupportFlag[]>(`/support-flags${status ? `?status=${status}` : ""}`), [status]);
   return (
-    <div>
-      <h2>Alertas educativas</h2>
-      <p className="muted">KAWSAY muestra la evidencia que hay detrás de cada alerta. No son diagnósticos: tú decides cómo acompañar.</p>
+    <div className="teacher-workflow">
+      <TeacherPageIntro kicker="ACOMPAÑAMIENTO · EVIDENCIA" title="Alertas educativas" description="Revisa la evidencia detrás de cada alerta; no son diagnósticos." icon="alert" />
       <div className="row">{FILTERS.map(([v, l]) => <button key={v} className={status === v ? "" : "ghost"} onClick={() => setStatus(v)}>{l}</button>)}</div>
       <ErrorBox message={flags.error} />
       {flags.loading ? <Loading /> : (flags.data?.length ?? 0) === 0 ? <p className="muted">No hay alertas con este filtro.</p> : flags.data?.map((f) => <FlagCard key={f.id} flag={f} onChanged={() => void flags.reload()} />)}

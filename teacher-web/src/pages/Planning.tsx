@@ -51,32 +51,32 @@ export function Planning() {
   return (
     <div className="teacher-workflow teacher-planning-page">
       <TeacherPageIntro kicker="PLANIFICACIÓN · CONTENIDOS EDUCATIVOS" title="Planificación de la institución"
-        description="Organiza contenidos por año, grado, área y competencia, respetando la malla curricular de cada institución." icon="book">
+        description="Organiza contenidos por año, grado, área y competencia." icon="book">
         <Link to="/actividades/nueva"><Icon name="tasks"/> Crear actividad</Link>
         <Link to="/aulas" className="secondary"><Icon name="classroom"/> Mis aulas</Link>
       </TeacherPageIntro>
       <section className="teacher-flow-grid" aria-label="Cómo usar la planificación">
         <div className="teacher-flow-card">
           <div className="teacher-flow-card-heading"><span><Icon name="book"/></span><div><h3>Documentos por grado y área</h3><p>Sube archivos PDF o Word como referencia educativa.</p></div></div>
-          <p className="teacher-flow-description">Puedes almacenar una malla por cada grado, pero <strong>subir un archivo no crea ni activa automáticamente la planificación estructurada.</strong> Los documentos deben revisarse antes de convertirse en actividades.</p>
+          <p className="teacher-flow-description">Una malla por grado. <strong>Subir un archivo no activa la planificación estructurada.</strong></p>
         </div>
         <div className="teacher-flow-card">
           <div className="teacher-flow-card-heading"><span><Icon name="check"/></span><div><h3>Planificación vigente</h3><p>Los temas activos habilitan la creación de ejercicios.</p></div></div>
           <ol className="teacher-flow-steps">
-            <li><span>1</span><div><strong>Crea un plan por año escolar</strong><p>Selecciona el marco curricular revisado y agrega periodos, unidades y temas.</p></div></li>
-            <li><span>2</span><div><strong>Solicita revisión</strong><p>La administración aprueba y activa la versión estructurada.</p></div></li>
-            <li><span>3</span><div><strong>Prepara actividades</strong><p>Las tareas se vinculan a la versión activa y a cada grado.</p></div></li>
+            <li><span>1</span><div><strong>Crea un plan por año escolar</strong><p>Agrega periodos, unidades y temas.</p></div></li>
+            <li><span>2</span><div><strong>Solicita revisión</strong><p>La administración aprueba y activa la versión.</p></div></li>
+            <li><span>3</span><div><strong>Prepara actividades</strong><p>Las tareas se vinculan a la versión activa.</p></div></li>
           </ol>
         </div>
       </section>
       <CurriculumDocuments onPreparePlan={user?.role === "TEACHER" ? prepareReference : undefined} />
-      <div className="teacher-flow-guidance"><strong>Nota:</strong> Los planes activos mantienen trazabilidad curricular. Los documentos adjuntos no sustituyen la aprobación humana.</div>
+      <div className="teacher-flow-guidance"><strong>Nota:</strong> Los documentos adjuntos no sustituyen la aprobación humana.</div>
       <ErrorBox message={plans.error ?? err} />
       {user?.role === "TEACHER" && (
         <section id="crear-plan-estructurado" className="teacher-plan-create" aria-label="Crear planificación estructurada">
         <Card title="Crear planificación estructurada">
-          {reference && <div className="teacher-flow-guidance" role="status"><strong>Referencia seleccionada:</strong> {reference.filename} · {reference.area} · {reference.grade_number}.º grado · {reference.academic_year}.<p>El nombre y año están preparados. El PDF no se ha convertido automáticamente en temas: registra el contenido revisado y envíalo a aprobación.</p></div>}
-          {!frameworks.loading && !frameworks.data?.length && <div className="teacher-flow-guidance" role="note"><strong>Falta un marco curricular estructurado.</strong> Solicita al administrador que registre y valide las competencias del MINEDU. Sin ese catálogo aún no es posible crear el plan.</div>}
+          {reference && <div className="teacher-flow-guidance" role="status"><strong>Referencia seleccionada:</strong> {reference.filename} · {reference.area} · {reference.grade_number}.º grado · {reference.academic_year}.<p>El PDF no se convierte automáticamente en temas; registra el contenido y envíalo a aprobación.</p></div>}
+          {!frameworks.loading && !frameworks.data?.length && <div className="teacher-flow-guidance" role="note"><strong>Falta un marco curricular estructurado.</strong> Solicita al administrador que registre las competencias del MINEDU.</div>}
           <form className="row" onSubmit={(e) => void create(e)}>
             <label>Nombre<input value={name} onChange={(e) => setName(e.target.value)} required minLength={2} /></label>
             <label>Año<input type="number" value={year} onChange={(e) => setYear(Number(e.target.value))} /></label>
@@ -88,7 +88,7 @@ export function Planning() {
         </section>
       )}
       {frameworks.error && <ErrorBox message={frameworks.error}/>}
-      {!plans.loading && !plans.data?.length && <div className="teacher-flow-empty"><Icon name="book"/><h3>Aún no hay planes estructurados</h3><p>La biblioteca de documentos funciona de manera independiente. Para crear ejercicios por grado necesitas crear un plan, definir sus unidades y solicitar la activación de la versión.</p></div>}
+      {!plans.loading && !plans.data?.length && <div className="teacher-flow-empty"><Icon name="book"/><h3>Aún no hay planes estructurados</h3><p>Para crear ejercicios por grado, crea un plan, define sus unidades y solicita la activación.</p></div>}
       {plans.loading ? <Loading /> : plans.data?.map((p) => (
         <Card key={p.id} title={p.name} actions={user?.role === "TEACHER" && <button className="ghost" onClick={() => void api.post(`/planning/plans/${p.id}/versions`).then(() => plans.reload()).catch((x: unknown) => setErr(errMsg(x)))}>Nueva versión</button>}>
           <ul className="list">{p.versions.map((v) => (

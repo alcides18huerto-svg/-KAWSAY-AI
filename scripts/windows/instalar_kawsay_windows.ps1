@@ -1,11 +1,11 @@
 $ErrorActionPreference = 'Stop'
-$root = Split-Path -Parent $MyInvocation.MyCommand.Path
+$root = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 Write-Host 'KAWSAY AI - verificacion e instalacion local' -ForegroundColor Cyan
 function RunChecked([string]$program, [string[]]$arguments) {
   & $program @arguments
   if ($LASTEXITCODE -ne 0) { throw "Falló $program $($arguments -join ' ') con código $LASTEXITCODE" }
 }
-if (-not (Test-Path (Join-Path $root 'teacher-web/package-lock.json'))) { throw 'Coloca este script en la raíz de KAWSAY-AI, junto a teacher-web y backend.' }
+if (-not (Test-Path (Join-Path $root 'teacher-web/package-lock.json'))) { throw 'No se encontro la raiz de KAWSAY-AI (teacher-web y backend). Conserva la carpeta scripts/windows dentro del proyecto.' }
 $node = Get-Command node -ErrorAction SilentlyContinue
 if (-not $node) { throw 'Node no está instalado. Instala Node >=24.15.0 con winget install OpenJS.NodeJS.LTS; cierra y vuelve a abrir PowerShell.' }
 $nodeVersion = (& node -p 'process.versions.node').Trim()
@@ -39,7 +39,7 @@ try {
  if (Test-Path 'tests') { RunChecked $mlPython @('-m','pytest','-q','tests') }
 } finally { Pop-Location }
 if (Get-Command flutter -ErrorAction SilentlyContinue) {
- Push-Location (Join-Path $root 'mobile')
+ Push-Location (Join-Path $root 'archive/mobile')
  try { RunChecked flutter @('pub','get'); RunChecked flutter @('analyze'); RunChecked flutter @('test') } finally { Pop-Location }
 } else { Write-Warning 'Flutter no instalado. Instala Flutter SDK + Android SDK si vas a compilar la app móvil.' }
 Write-Host 'Instalación de dependencias terminada. Revisa los resultados de las pruebas mostrados arriba.' -ForegroundColor Green

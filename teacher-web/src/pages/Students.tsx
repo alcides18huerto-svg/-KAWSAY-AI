@@ -20,11 +20,10 @@ export function Students() {
 
   return (
     <div className="student-management teacher-workflow">
-      <TeacherPageIntro kicker="APRENDIZAJE · GESTIÓN DEL AULA" title="Mis estudiantes" icon="graduation" description="Registra estudiantes por grado, asigna sus credenciales y acompaña su progreso individual.">
+      <TeacherPageIntro kicker="APRENDIZAJE · GESTIÓN DEL AULA" title="Mis estudiantes" icon="graduation" description="Registra estudiantes y gestiona sus credenciales de acceso.">
         <Link to="/aulas"><Icon name="classroom"/> Mis aulas</Link>
         <Link to="/actividades/nueva" className="secondary"><Icon name="tasks"/> Preparar actividad</Link>
       </TeacherPageIntro>
-      <div className="teacher-flow-guidance"><strong>Acceso protegido.</strong> Cada estudiante mantiene su grado oficial y el idioma que declara. El docente gestiona las credenciales de forma privada.</div>
       <Card title="Seleccionar aula">
         <ErrorBox message={rooms.error ?? languages.error} />
         {rooms.loading || languages.loading ? <Loading /> : rooms.data?.length ? (
@@ -34,7 +33,7 @@ export function Students() {
               {rooms.data.map((room) => <option key={room.id} value={room.id}>{room.name} · {room.academic_year}</option>)}
             </select>
           </label>
-        ) : <div className="teacher-flow-empty"><Icon name="classroom"/><h3>Primero crea un aula</h3><p>No hay aulas registradas. Para agregar estudiantes necesitas crear una sección e indicar su año escolar.</p><Link to="/aulas"><Icon name="arrow"/> Crear mi primera aula</Link></div>}
+        ) : <div className="teacher-flow-empty"><Icon name="classroom"/><h3>Primero crea un aula</h3><p>Para agregar estudiantes necesitas crear una sección con su año escolar.</p><Link to="/aulas"><Icon name="arrow"/> Crear mi primera aula</Link></div>}
       </Card>
       {classroomId && <ClassroomStudents key={classroomId} classroomId={classroomId} languages={languages.data ?? []} />}
     </div>
@@ -75,8 +74,8 @@ function ClassroomStudents({ classroomId, languages }: { classroomId: string; la
       });
       setCredentials(created);
       setNotice(loginMode === "email"
-        ? "Cuenta estudiantil creada. Entrega el correo y contraseña de manera privada al estudiante o su familia."
-        : "Cuenta estudiantil creada con código y PIN para acceso tradicional.");
+        ? "Cuenta creada. Entrega el correo y la contraseña en privado."
+        : "Cuenta creada con código y PIN de acceso.");
       setName(""); setEmail(""); setPassword(""); setShowPassword(false);
       await room.reload();
     } catch (reason) { setError(errMsg(reason)); } finally { setBusy(false); }
@@ -92,7 +91,7 @@ function ClassroomStudents({ classroomId, languages }: { classroomId: string; la
         const pin = await api.post<{ pin: string }>(`/students/${student.id}/reset-pin`);
         setCredentials({ id: student.id, display_name: student.display_name, grade_id: student.grade_id,
           login_code: detail.login_code, pin: pin.pin });
-        setNotice("El PIN anterior ya no funciona. Entrega estas nuevas credenciales en privado.");
+        setNotice("PIN actualizado. Entrega las nuevas credenciales en privado.");
       }
     } catch (reason) { setError(errMsg(reason)); }
   };
@@ -103,7 +102,7 @@ function ClassroomStudents({ classroomId, languages }: { classroomId: string; la
     try {
       setResetBusy(true); setError(null);
       await api.post(`/students/${resetTarget.id}/reset-password`, {password: newPassword});
-      setNotice("Contraseña actualizada. Las sesiones anteriores quedaron revocadas. Comparte la nueva contraseña por un canal privado.");
+      setNotice("Contraseña actualizada. Las sesiones anteriores quedaron revocadas.");
       setResetTarget(null); setNewPassword(""); setShowResetPassword(false);
     } catch (reason) { setError(errMsg(reason)); } finally { setResetBusy(false); }
   };
@@ -132,7 +131,7 @@ function ClassroomStudents({ classroomId, languages }: { classroomId: string; la
       <section className="student-enroll" aria-labelledby="student-enroll-title">
         <div className="student-enroll-heading"><span className="student-enroll-badge"><Icon name="students" /></span>
           <div><p className="student-enroll-kicker">ACCESO EDUCATIVO</p><h3 id="student-enroll-title">Registrar nuevo estudiante</h3>
-          <p>El docente asigna el correo y la contraseña para ingresar al espacio de aprendizaje.</p></div>
+          <p>Asigna el acceso del estudiante al espacio de aprendizaje.</p></div>
         </div>
         <div className="student-enroll-method" role="group" aria-label="Método de inicio de sesión">
           <button type="button" className={loginMode === "email" ? "active" : ""} aria-pressed={loginMode === "email"} onClick={() => {setLoginMode("email"); setCredentials(null); setError(null);}}>Correo y contraseña</button>
@@ -153,20 +152,20 @@ function ClassroomStudents({ classroomId, languages }: { classroomId: string; la
               <p className="student-enroll-hint">{password.length >= 12 ? "✓ Longitud mínima cumplida" : `${password.length}/12 caracteres mínimos`}. No reutilices contraseñas personales.</p>
             </div>
           </>}
-          <div className="student-enroll-footer"><p><Icon name="shield" /> Solo el docente asignado puede crear cuentas en esta aula. La contraseña se guarda con hash.</p>
+          <div className="student-enroll-footer"><p><Icon name="shield" /> Solo el docente asignado puede crear cuentas en esta aula.</p>
             <button type="submit" disabled={busy || !grades.data?.length}>{busy ? "Registrando…" : "Crear estudiante"} <Icon name="arrow" /></button></div>
         </form>
       </section>
 
       {credentials && <div className="student-access-created" role="status">
         <strong><Icon name="check" /> Estudiante registrado: {credentials.display_name}</strong>
-        {credentials.email ? <p>Acceso mediante el correo <code>{credentials.email}</code> y la contraseña que acabas de establecer. Por seguridad, el servidor no vuelve a mostrarla.</p>
+        {credentials.email ? <p>Acceso mediante <code>{credentials.email}</code> y la contraseña que acabas de establecer. El servidor no vuelve a mostrarla.</p>
           : <p>Credenciales de un solo uso: <span>Código <code>{credentials.login_code}</code> · PIN <code>{credentials.pin}</code></span></p>}
         <button type="button" className="ghost" onClick={() => setCredentials(null)}>Entendido</button>
       </div>}
       {resetTarget && <form className="student-enroll-reset" onSubmit={(event) => void savePassword(event)}>
         <h3>Cambiar contraseña de {resetTarget.display_name}</h3>
-        <p>La nueva contraseña desactivará todas las sesiones anteriores del estudiante.</p>
+        <p>La nueva contraseña cerrará las sesiones anteriores del estudiante.</p>
         <label htmlFor="reset-student-password">Nueva contraseña</label>
         <div className="student-enroll-password-control"><input id="reset-student-password" type={showResetPassword ? "text" : "password"} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} minLength={12} maxLength={128} autoComplete="new-password" required />
           <button type="button" onClick={() => setShowResetPassword(!showResetPassword)} aria-label={showResetPassword ? "Ocultar contraseña" : "Mostrar contraseña"}><Icon name={showResetPassword ? "eye-off" : "eye"} />{showResetPassword ? "Ocultar" : "Mostrar"}</button>
@@ -221,7 +220,7 @@ function LanguageEditor({ student, languages, onClose, onSaved }: { student: Stu
 
   return <section className="language-form">
     <div className="card-h"><h3>Idioma de {student.display_name}</h3><button type="button" className="ghost" onClick={onClose}>Cerrar</button></div>
-    <p className="muted">Registra únicamente lo declarado por el estudiante o su familia. “Sin especificar” no presupone español.</p>
+    <p className="muted">Registra lo declarado por el estudiante o su familia.</p>
     <ErrorBox message={preference.error ?? error} />
     {preference.loading ? <Loading /> : <form className="stack" onSubmit={(event) => void save(event)}>
       <div className="row">

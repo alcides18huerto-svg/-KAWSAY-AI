@@ -25,6 +25,9 @@ Para: **Max**. Tiempo: ~5 minutos. No necesitas instalar ninguna base de datos (
 4. Entra en `http://localhost:5173` con:
    - Docente: `maestra@demo.pe` / `Aula-Multigrado-2026!`
    - Administrador: `admin@demo.pe` / `Kawsay-Demo-Local-2026`
+   - Estudiante: elige la pestaña **Estudiante** y el método **Código y PIN**. La salida de
+     `python scripts/dev.py demo` imprime al final el código y el PIN de Juan, Ana y María.
+     Su panel está en `/estudiante` (Mi inicio, Mis cursos, Mis actividades y Mi progreso).
    (credenciales solo de demostración local).
 5. Documentación interactiva de la API: `http://127.0.0.1:8000/docs`.
 

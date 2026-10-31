@@ -93,21 +93,15 @@ export function AdminOverview({schools,staff,audits,stats,loading,errors,onRefre
   async function refresh(){if(busy)return;setBusy(true);try{await onRefresh();}finally{setBusy(false);}}
   return <div className="kd-overview kd-design-2026">
     <div className="kd-mobile-brandbar">
-      <span className="kd-mobile-brand"><Icon name="leaf"/><span>KAWSAY <em>AI</em><small>Educación que acompaña</small></span></span>
+      <span className="kd-mobile-brand"><Icon name="leaf"/><span>KAWSAY <em>AI</em></span></span>
       <Link aria-label="Auditoría y notificaciones" to="/admin/sistema"><Icon name="bell"/></Link>
     </div>
     <section className="kd-hero" aria-label="Bienvenida al panel de administración">
       <div className="kd-hero-copy">
-        <p className="kd-hero-kicker">APRENDER · CRECER · ACOMPAÑAR</p>
+        <p className="kd-hero-kicker">PANEL DE ADMINISTRACIÓN</p>
         <h1>Bienvenido,<br/><em>Administrador</em></h1>
-        <h2>Gestiona las instituciones, docentes, estudiantes y recursos de KAWSAY AI.</h2>
-        <div className="kd-motto">
-          <span><Icon name="book"/> APRENDER</span>
-          <span><Icon name="leaf"/> CRECER</span>
-          <span><Icon name="students"/> ACOMPAÑAR</span>
-        </div>
+        <h2>Gestiona instituciones, docentes, estudiantes y recursos.</h2>
       </div>
-      <p className="kd-hero-quote">Más educación<br/>para más comunidades.</p>
     </section>
     {errors.length>0&&<div className="kd-warning" role="alert">
       No se pudieron consultar todos los indicadores.
@@ -138,7 +132,7 @@ export function AdminOverview({schools,staff,audits,stats,loading,errors,onRefre
             <span className={'kd-audit-symbol tone-'+tones[i%4]}><Icon name={i%2?'tasks':'check'}/></span>
             <div><strong>{a.action.replace(/[._]/g,' ')}</strong><small>{a.target_type} · {new Date(a.created_at).toLocaleString('es-PE',{dateStyle:'short',timeStyle:'short'})}</small></div>
           </div>)}
-          {audits?.length===0&&<div className="kd-empty-activity"><span><Icon name="activity"/></span><strong>Sin movimientos recientes</strong><p>Las acciones del sistema aparecerán aquí cuando se registren.</p><Link to="/admin/sistema">Consultar auditoría <Icon name="arrow"/></Link></div>}
+          {audits?.length===0&&<div className="kd-empty-activity"><span><Icon name="activity"/></span><strong>Sin movimientos recientes</strong><p>Las acciones aparecerán aquí.</p><Link to="/admin/sistema">Consultar auditoría <Icon name="arrow"/></Link></div>}
           {!audits&&<p className="kd-empty">{loading?'Consultando actividad…':'Actividad no disponible.'}</p>}
         </div>
       </section>
@@ -156,7 +150,6 @@ export function AdminOverview({schools,staff,audits,stats,loading,errors,onRefre
           <Link to="/admin/curriculo"><span className="kd-taskmark"><Icon name="book"/></span>Actualizar contenidos y currículo <Icon name="arrow"/></Link>
           <Link to="/admin/sistema"><span className="kd-taskmark"><Icon name="shield"/></span>Consultar registros del sistema <Icon name="arrow"/></Link>
         </div>
-        <p className="kd-subtext">Acciones de gestión · sin fechas límite asignadas.</p>
       </section>
       <section className="kd-panel kd-users">
         <header className="kd-panel-heading"><h3>Usuarios del sistema</h3><Link className="kd-textlink" to="/admin/usuarios">Ver todos <Icon name="arrow"/></Link></header>
@@ -174,14 +167,13 @@ export function AdminOverview({schools,staff,audits,stats,loading,errors,onRefre
           <span className="kd-shortcut-icon"><CounterIcon icon={item.icon}/></span><strong>{item.label}</strong><span className="kd-shortcut-arrow"><Icon name="arrow"/></span>
         </Link>)}</div>
       </section>
-      <section className="kd-panel kd-help"><Icon name="leaf"/><h3>KAWSAY AI</h3><p>Educación adaptativa con inteligencia artificial y decisiones humanas.</p><Link to="/admin/configuracion">Configurar plataforma <Icon name="arrow"/></Link></section>
+      <section className="kd-panel kd-help"><Icon name="leaf"/><h3>KAWSAY AI</h3><p>Educación adaptativa con decisiones humanas.</p><Link to="/admin/configuracion">Configurar plataforma <Icon name="arrow"/></Link></section>
     </div>
     <section className="kd-panel kd-institutions">
-      <header className="kd-panel-heading"><div><h3>Instituciones de KAWSAY AI</h3><p>Datos registrados; el mapa se mantiene ilustrativo hasta contar con coordenadas verificadas.</p></div><Link className="kd-outline" to="/admin/instituciones">Administrar</Link></header>
+      <header className="kd-panel-heading"><div><h3>Instituciones de KAWSAY AI</h3><p>El mapa es ilustrativo hasta contar con coordenadas verificadas.</p></div><Link className="kd-outline" to="/admin/instituciones">Administrar</Link></header>
       <label className="kd-search"><Icon name="search"/><input type="search" aria-label="Buscar instituciones" placeholder="Buscar institución…" value={filter} onChange={e=>setFilter(e.target.value)}/><span>{filtered.length} resultados</span></label>
       <div className="kd-school-list">{filtered.slice(0,6).map(s=><div key={s.id}><Icon name="classroom"/><span><strong>{s.name}</strong><small>{s.region||'Región no indicada'}</small></span><Link to="/admin/instituciones" aria-label={'Administrar '+s.name}><Icon name="arrow"/></Link></div>)}{schools&&filtered.length===0&&<p className="kd-empty">{filter?'Sin coincidencias.':'No hay instituciones registradas.'}</p>}</div>
     </section>
-    <div className="kd-bottom-slogan"><Icon name="book"/><span><strong>Juntos transformamos comunidades</strong><small>Educación, tecnología e identidad cultural.</small></span><em>Más educación para más comunidades.</em></div>
     <nav className="kd-mobile-bottom-nav" aria-label="Accesos de administración">
       <Link to="/admin" aria-current="page"><Icon name="dashboard"/><span>Inicio</span></Link>
       <Link to="/admin/instituciones"><Icon name="classroom"/><span>Instituciones</span></Link>

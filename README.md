@@ -38,6 +38,9 @@ python scripts/dev.py backup    # respaldo de la base SQLite
 
 E2E en Chromium (instalación y ejecución): `docs/16-testing.md`; comando desde la raíz: `npm --prefix teacher-web run test:e2e`.
 
+Despliegue local en Windows: `docs/deploy/README_DEPLOY_RAPIDO.md`; publicación en Render: `docs/deploy/PUBLICAR_EN_RENDER.md`.
+Los scripts de Windows están en `scripts/windows/`.
+
 ## Lo que NO está terminado (dicho con claridad)
 - La app Flutter y el workflow n8n se archivaron en `archive/`; no forman parte del producto de tres paneles.
 - El modelo de ML se entrenó con datos **sintéticos**; no hay datos reales ni modelo aprobado. La mejora sobre una heurística simple no es significativa.

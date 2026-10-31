@@ -7,7 +7,7 @@
 1. Instala y abre [Docker Desktop](https://www.docker.com/products/docker-desktop/).
 2. Descomprime este ZIP. Desde PowerShell, dentro de `KAWSAY-AI`, ejecuta:
    ```powershell
-   powershell -ExecutionPolicy Bypass -File .\iniciar_kawsay_windows.ps1
+   powershell -ExecutionPolicy Bypass -File .\scripts\windows\iniciar_kawsay_windows.ps1
    ```
 3. El primer inicio descarga imágenes y paquetes; necesita **Internet**. La aplicación instalada seguirá disponible en la LAN sin Internet externo si tu red local está funcionando (funciones de IA externas seguirán sin conexión).
 4. Abre **http://127.0.0.1:8080** en esa computadora.
@@ -39,4 +39,4 @@ Render ofrece sitios estáticos y servicios web gratuitos, pero apaga las instan
 
 ## Qué verificó la auditoría
 
-Consulta `docs/REPORTE_AUDITORIA_Y_PRUEBAS_LOCAL.md` para resultados, limitaciones y seguridad. La compilación final `vite build` y la prueba offline con Chromium deben completarse en tu entorno con Node compatible, dependencias Linux/Windows y navegador permitido.
+Consulta `docs/REPORTE_AUDITORIA_Y_PRUEBAS_LOCAL.md` para resultados, limitaciones y seguridad. Guía de publicación en Render: `docs/deploy/PUBLICAR_EN_RENDER.md`. La compilación final `vite build` y la prueba offline con Chromium deben completarse en tu entorno con Node compatible, dependencias Linux/Windows y navegador permitido.

@@ -93,9 +93,10 @@ def demo() -> None:
         print(f"""
 ================ DATOS DEMO CARGADOS ================
  Backend + documentación:  http://127.0.0.1:8000/docs
- Panel docente (otra terminal: python scripts/dev.py web) → http://localhost:5173
+ Panel web (otra terminal: python scripts/dev.py web) → http://localhost:5173
    Docente:        {DEMO_TEACHER[0]}   /   {DEMO_TEACHER[1]}
    Administrador:  {DEMO_ADMIN[0]}   /   {DEMO_ADMIN[1]}
+   Estudiante:     pestaña "Estudiante" → "Código y PIN" (mira arriba los códigos y PIN impresos)
  (Credenciales SOLO de demostración local: cámbialas o borra backend/data/kawsay.db antes de un uso real.)
  El servidor sigue corriendo; Ctrl+C para detenerlo.
 =====================================================""")

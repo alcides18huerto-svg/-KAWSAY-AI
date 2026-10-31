@@ -41,7 +41,7 @@ export function Dashboard() {
       <div className="teacher-dashboard-intro">
         <p className="eyebrow"><Icon name="leaf" /> ESPACIO DOCENTE · KAWSAY AI</p>
         <h2>Bienvenido, <span>Docente</span></h2>
-        <p>Transforma cada clase en una oportunidad para aprender, crecer y acompañar a tu comunidad.</p>
+        <p>Resumen de tus aulas, actividades y alertas.</p>
         <div className="teacher-dashboard-actions">
           <Link className="button teacher-register-action" to="/estudiantes">
             <Icon name="students"/> Registrar estudiante
@@ -50,10 +50,8 @@ export function Dashboard() {
         </div>
         <div className="teacher-hero-meta">
           <span><Icon name="classroom"/> {rooms.loading?"Consultando aulas":`${rooms.data?.length??"—"} aulas`}</span>
-          <span><Icon name="leaf"/> Aprender · Crecer · Acompañar</span>
         </div>
       </div>
-      <span className="teacher-hero-motto">Educación que acompaña a cada comunidad.</span>
     </header>
 
     <div className="teacher-v2-section-title">
@@ -89,7 +87,6 @@ export function Dashboard() {
               </select>
             </label>
             <div className="teacher-v2-current-room"><span><Icon name="classroom"/></span><div><strong>{currentRoom?.name}</strong><small>Año escolar {currentRoom?.academic_year}</small></div><Link to="/estudiantes">Gestionar <Icon name="arrow"/></Link></div>
-            <p>Los indicadores y las alertas de aprendizaje se muestran debajo para el aula seleccionada.</p>
           </div>}
       </section>
       <section className="teacher-v2-panel teacher-v2-work" aria-labelledby="teacher-work-heading">
@@ -139,7 +136,6 @@ export function Dashboard() {
       </div>
       <RoomPanel key={roomId} roomId={roomId}/>
     </section>}
-    <div className="teacher-v2-footer"><Icon name="book"/><span><strong>Juntos transformamos comunidades.</strong><small>La tecnología acompaña; cada decisión pedagógica pertenece al docente.</small></span><em>KAWSAY AI</em></div>
   </div>;
 }
 
@@ -154,7 +150,7 @@ function RoomPanel({ roomId }: { roomId: string }) {
 
   return (
     <>
-      <div className="room-selector"><p className="muted">Datos consultados al servidor del aula.</p><button className="ghost" onClick={reloadAll} disabled={summary.loading || flags.loading || strengths.loading || forecast.loading}>Actualizar datos</button></div>
+      <div className="room-selector"><button className="ghost" onClick={reloadAll} disabled={summary.loading || flags.loading || strengths.loading || forecast.loading}>Actualizar datos</button></div>
       <ErrorBox message={summary.error} />
       {summary.loading && <Loading />}
       {summary.data && (
@@ -171,7 +167,6 @@ function RoomPanel({ roomId }: { roomId: string }) {
       )}
       <div className="dashboard-columns"><div>
       <Card title="Alertas educativas" actions={<Link className="text-link" to="/alertas">Ver todas <Icon name="arrow" /></Link>}>
-        <p className="section-description">Señales para acompañar, con evidencia que puedes revisar.</p>
         <ErrorBox message={flags.error} />
         {flags.loading ? <Loading /> : flags.error ? null : active.length === 0 ? <p className="muted">No hay alertas activas. Aparecerán solo cuando exista evidencia suficiente.</p> :
           active.map((f) => (
@@ -185,7 +180,6 @@ function RoomPanel({ roomId }: { roomId: string }) {
       </div><div className="dashboard-aside">
       <Card title="Fortalezas observadas">
         <div className="aside-illustration"><Icon name="spark" /></div>
-        <p className="section-description">También importa reconocer lo que va bien.</p>
         <ErrorBox message={strengths.error} />
         {strengths.loading ? <Loading /> : strengths.error ? null : (strengths.data?.length ?? 0) === 0 ? <p className="muted">Aún no hay evidencia suficiente de fortalezas.</p> : (
           <ul className="strengths-list">{strengths.data?.map((s, i) => <li key={i}><span className="strength-dot"><Icon name="check" /></span><div><strong>{s.student.display_name}</strong><small>{s.student.grade} · {s.competency.name}</small><p>{s.strengths.map((x) => x.name.replace(/_/g, " ")).join(", ")}</p></div></li>)}</ul>

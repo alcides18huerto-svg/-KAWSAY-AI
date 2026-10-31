@@ -116,7 +116,7 @@ export function Admin({ section = "overview" }: { section?: AdminSection }) {
           <p className="eyebrow">KAWSAY AI <span className="admin-hero-separator">/</span> {page?.label}</p>
           <h2>{page?.title}</h2>
           <p>{page?.description}</p>
-          <div className="admin-hero-meta"><span><Icon name="leaf"/> Educación que acompaña</span>{pageCount !== undefined && <span><Icon name={page?.icon ?? "dashboard"}/> {pageCount.toLocaleString("es-PE")} {countLabel}</span>}</div>
+          <div className="admin-hero-meta">{pageCount !== undefined && <span><Icon name={page?.icon ?? "dashboard"}/> {pageCount.toLocaleString("es-PE")} {countLabel}</span>}</div>
         </div>
         <div className="admin-hero-emblem" aria-hidden="true">{page && <Icon name={page.icon}/>}</div>
       </header>
@@ -132,7 +132,7 @@ export function Admin({ section = "overview" }: { section?: AdminSection }) {
               <div className="admin-institution-head-copy">
                 <p className="admin-institution-kicker">DIRECTORIO EDUCATIVO</p>
                 <h3 id="admin-institutions-heading">Instituciones registradas</h3>
-                <p>Consulta las instituciones asociadas a KAWSAY AI.</p>
+                <p>Instituciones asociadas a la plataforma.</p>
               </div>
               <span className="admin-institution-count">{schools.loading ? "…" : schools.data?.length ?? "—"} <small>registradas</small></span>
             </header>
@@ -162,7 +162,7 @@ export function Admin({ section = "overview" }: { section?: AdminSection }) {
               {schools.data.filter(s=>`${s.name} ${s.region || ""}`.toLocaleLowerCase("es").includes(schoolQuery.trim().toLocaleLowerCase("es"))).length === 0 &&
                 <div className="admin-institution-empty"><Icon name="search"/><strong>No se encontraron instituciones</strong><span>Prueba con otro nombre o región.</span></div>}
             </div> : null}
-            <footer className="admin-institution-panel-foot"><Icon name="shield"/> Información consultada desde el sistema, sin datos simulados.</footer>
+            <footer className="admin-institution-panel-foot"><Icon name="shield"/> Datos del sistema, sin valores simulados.</footer>
           </section>
           <section className="admin-institution-panel admin-institutions-create" aria-labelledby="admin-create-school-heading">
             <header className="admin-institution-panel-head">
@@ -170,7 +170,7 @@ export function Admin({ section = "overview" }: { section?: AdminSection }) {
               <div className="admin-institution-head-copy">
                 <p className="admin-institution-kicker">NUEVA INSTITUCIÓN</p>
                 <h3 id="admin-create-school-heading">Registrar institución</h3>
-                <p>Agrega un colegio o sede a la plataforma.</p>
+                <p>Agrega un colegio o sede.</p>
               </div>
             </header>
             <form className="admin-institution-form" onSubmit={(e)=>void addSchool(e)}>
@@ -190,7 +190,7 @@ export function Admin({ section = "overview" }: { section?: AdminSection }) {
             </form>
             <div className="admin-institution-next">
               <Icon name="check"/>
-              <p>Después de registrar la institución podrás asociarle docentes, aulas y estudiantes.</p>
+              <p>Luego podrás asociar docentes, aulas y estudiantes.</p>
             </div>
           </section>
         </div>
@@ -203,7 +203,7 @@ export function Admin({ section = "overview" }: { section?: AdminSection }) {
               <div>
                 <p className="admin-kicker">GESTIÓN DE ACCESOS</p>
                 <h3 id="teacher-form-title">Registrar nuevo docente</h3>
-                <p>Completa los datos para darle acceso a su espacio educativo.</p>
+                <p>Datos de acceso al espacio educativo.</p>
               </div>
             </div>
             <form className="admin-teacher-form" onSubmit={(e) => void addTeacher(e)} autoComplete="off">
@@ -253,7 +253,7 @@ export function Admin({ section = "overview" }: { section?: AdminSection }) {
                 </div>
               </div>
               <div className="admin-form-actions">
-                <p><Icon name="check" /> Las contraseñas se guardan cifradas. No se pueden consultar después.</p>
+                <p><Icon name="check" /> Contraseñas cifradas; no se pueden consultar después.</p>
                 <button className="admin-submit" type="submit"
                   disabled={teacherBusy || !schools.data?.length}>
                   {teacherBusy ? "Registrando…" : "Crear docente"}
@@ -264,9 +264,9 @@ export function Admin({ section = "overview" }: { section?: AdminSection }) {
           </section>
           <aside className="admin-onboarding">
             <div className="admin-onboarding-icon"><Icon name="leaf" /></div>
-            <p className="admin-kicker">COMUNIDAD EDUCATIVA</p>
-            <h3>Educación que crece en equipo.</h3>
-            <p>Cada docente registrado tendrá acceso a sus propias aulas, estudiantes y actividades.</p>
+            <p className="admin-kicker">ACCESO DOCENTE</p>
+            <h3>Espacio de trabajo</h3>
+            <p>El docente accede a sus aulas, estudiantes y actividades.</p>
             <div className="admin-onboarding-step"><span>01</span> Completa los datos</div>
             <div className="admin-onboarding-step"><span>02</span> Asigna su institución</div>
             <div className="admin-onboarding-step"><span>03</span> Comparte el acceso de forma privada</div>
@@ -304,7 +304,7 @@ export function Admin({ section = "overview" }: { section?: AdminSection }) {
 
       {section === "students" && <section className="admin-supplement">
         <h2>Estudiantes de la plataforma</h2>
-        <p>Visión general de los estudiantes activos, sin revelar datos personales. La gestión individual corresponde a los docentes autorizados.</p>
+        <p>Estudiantes activos; la gestión individual corresponde a los docentes.</p>
         <div className="admin-sup-grid">
           <div><Icon name="graduation"/><strong>{stats.data?.students ?? "—"}</strong><span>Estudiantes activos</span></div>
           <div><Icon name="classroom"/><strong>{stats.data?.institutions ?? "—"}</strong><span>Instituciones</span></div>
@@ -313,25 +313,25 @@ export function Admin({ section = "overview" }: { section?: AdminSection }) {
         <div className="admin-sup-rows">{stats.data?.grades.length ? stats.data.grades.map(g=><div key={g.level+g.grade}><span>{g.grade}.° {g.level.toLowerCase()}</span><strong>{g.count}</strong></div>) : <p>Aún no hay estudiantes con grados registrados.</p>}</div>
       </section>}
       {section === "tasks" && <section className="admin-supplement">
-        <h2>Asignaciones y tareas</h2><p>Resumen global de las tareas. Solo los docentes pueden crear, revisar y publicar actividades educativas.</p>
+        <h2>Asignaciones y tareas</h2><p>Resumen global. Solo los docentes crean y publican actividades.</p>
         <div className="admin-sup-grid"><div><Icon name="tasks"/><strong>{stats.data?.published_assignments ?? "—"}</strong><span>Tareas publicadas</span></div><div><Icon name="check"/><strong>{stats.data?.student_assignments ?? "—"}</strong><span>Asignaciones a estudiantes</span></div></div>
       </section>}
       {section === "reports" && <section className="admin-supplement">
-        <h2>Reportes de aprendizaje</h2><p>Indicadores agregados para administrar la plataforma. Estos valores proceden del servidor; no son resultados simulados de IA.</p>
+        <h2>Reportes de aprendizaje</h2><p>Indicadores agregados del servidor; no son resultados simulados.</p>
         <div className="admin-sup-grid">{[["Instituciones",stats.data?.institutions],["Docentes",stats.data?.teachers],["Estudiantes",stats.data?.students],["Tareas publicadas",stats.data?.published_assignments]].map(([label,value])=><div key={String(label)}><Icon name="chart"/><strong>{value ?? "—"}</strong><span>{label}</span></div>)}</div>
         <p>Los análisis pedagógicos individuales se mantienen en las cuentas docentes autorizadas.</p>
       </section>}
       {section === "users" && <section className="admin-supplement">
-        <h2>Usuarios y roles</h2><p>Directorio de usuarios del personal. Los accesos están protegidos por permisos de administrador y docente.</p>
+        <h2>Usuarios y roles</h2><p>Directorio del personal con permisos por rol.</p>
         <div className="admin-sup-rows">{staff.data?.filter(u=>u.role!=="STUDENT").map(u=><div key={u.id}><span>{u.display_name} · {u.role==="ADMIN"?"Administrador":"Docente"} · {u.email}</span><span className="admin-user-rows-end"><strong>{u.is_active?"Activo":"Inactivo"}</strong>{u.id!==user?.id&&<button type="button" className="ghost" disabled={updatingId===u.id} onClick={()=>void changeStaffStatus(u)}>{updatingId===u.id?"Guardando…":u.is_active?"Desactivar":"Reactivar"}</button>}</span></div>)}</div>
       </section>}
       {section === "configuration" && <section className="admin-supplement">
-        <h2>Configuración</h2><p>KAWSAY AI utiliza permisos por roles, autenticación y registro de auditoría. Las opciones de configuración del servidor se administran de forma privada desde Render.</p>
+        <h2>Configuración</h2><p>Permisos por rol, autenticación y auditoría. La configuración del servidor se administra en Render.</p>
         <div className="admin-sup-rows"><div><span>Autenticación</span><strong>Habilitada</strong></div><div><span>Acceso administrativo</span><strong>Restringido</strong></div></div>
       </section>}
       {section === "backups" && <section className="admin-supplement">
-        <h2>Respaldos</h2><p>Atención: esta demostración utiliza SQLite en el sistema de archivos efímero de Render Free. El contenido puede perderse durante reinicios o despliegues.</p>
-        <p>Para datos escolares reales se necesita una base de datos persistente, respaldos automatizados y una política de recuperación antes de usar este servicio.</p>
+        <h2>Respaldos</h2><p>Demo con SQLite en almacenamiento efímero: el contenido puede perderse al reiniciar o desplegar.</p>
+        <p>Para datos reales se requiere una base persistente y respaldos automatizados.</p>
         <div className="admin-sup-rows"><div><span>Persistencia garantizada</span><strong>No disponible en esta demo</strong></div></div>
       </section>}
     </div>

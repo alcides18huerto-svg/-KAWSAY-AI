@@ -6,7 +6,7 @@
 - No se ha confirmado una compilación React ni una prueba PWA en navegador.
 
 ## Cambios efectuados
-- Se corrigió el instalador `instalar_kawsay_windows.ps1` para ejecutar pruebas frontend y pruebas de integración, además de las pruebas backend de autenticación, actividades y sincronización, después de instalar los requisitos.
+- Se corrigió el instalador `scripts/windows/instalar_kawsay_windows.ps1` para ejecutar pruebas frontend y pruebas de integración, además de las pruebas backend de autenticación, actividades y sincronización, después de instalar los requisitos.
 - El ZIP entregado excluye el `node_modules` incompleto y las cachés generadas, con el objetivo de que `npm ci` instale dependencias desde cero en Node 24.15+.
 
 ## Pruebas ejecutadas
@@ -16,6 +16,6 @@ Resultado: **37 passed in 12.37s**.
 
 ## En la PC con Node actualizado
 Desde la carpeta raíz del proyecto, ejecutar PowerShell:
-`powershell -ExecutionPolicy Bypass -File .\instalar_kawsay_windows.ps1`
+`powershell -ExecutionPolicy Bypass -File .\scripts\windows\instalar_kawsay_windows.ps1`
 
 Esto requiere acceso al registro npm, Python y acceso al índice pip. La ejecución local no ha sido verificada en este entorno. Las pruebas offline del navegador siguen pendientes; las pruebas de backend no son prueba de funcionamiento offline completo.
