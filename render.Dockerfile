@@ -13,6 +13,7 @@ RUN addgroup --system kawsay && adduser --system --ingroup kawsay kawsay
 COPY backend/requirements.txt ./requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ ./
+COPY scripts/demo_e2e.py ./scripts/demo_e2e.py
 COPY --from=web-build /web/dist/ /srv/web-dist/
 RUN mkdir -p /srv/data && chown -R kawsay:kawsay /srv
 USER kawsay
@@ -20,4 +21,4 @@ ENV KAWSAY_SERVE_WEB_DIR=/srv/web-dist
 EXPOSE 10000
 HEALTHCHECK --interval=30s --timeout=5s --retries=4 \
   CMD python -c "import os,urllib.request; urllib.request.urlopen(f'http://127.0.0.1:{os.getenv(\"PORT\",\"10000\")}/health',timeout=4)"
-CMD ["sh", "-c", "alembic -c alembic.ini upgrade head && python -m app.demo_bootstrap && exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-10000} --proxy-headers"]
+CMD ["sh", "start.sh"]

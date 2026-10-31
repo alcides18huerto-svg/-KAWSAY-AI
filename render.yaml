@@ -8,7 +8,7 @@ services:
     dockerfilePath: ./render.Dockerfile
     dockerContext: .
     healthCheckPath: /health
-    autoDeploy: false
+    autoDeploy: true
     envVars:
       - key: APP_ENV
         value: production
@@ -20,3 +20,25 @@ services:
         value: ""
       - key: JWT_SECRET
         sync: false
+      - key: KAWSAY_DEMO_SEED
+        value: "1"
+      - key: KAWSAY_DEMO_BOOTSTRAP
+        value: "1"
+      - key: KAWSAY_DEMO_TEACHER_EMAIL
+        value: maestra@demo.pe
+      - key: KAWSAY_DEMO_TEACHER_PASSWORD
+        value: "Aula-Multigrado-2026!"
+      - key: KAWSAY_DEMO_ADMIN_ENABLED
+        value: "1"
+      - key: KAWSAY_DEMO_ADMIN_EMAIL
+        value: admin@demo.pe
+      - key: KAWSAY_DEMO_ADMIN_PASSWORD
+        value: Kawsay-Demo-Local-2026
+      - key: KAWSAY_ADMIN_EMAIL
+        value: admin@demo.pe
+      - key: KAWSAY_ADMIN_PASSWORD
+        value: Kawsay-Demo-Local-2026
+      - key: KAWSAY_TEACHER_EMAIL
+        value: maestra@demo.pe
+      - key: KAWSAY_TEACHER_PASSWORD
+        value: "Aula-Multigrado-2026!"

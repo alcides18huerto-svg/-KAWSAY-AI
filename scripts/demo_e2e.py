@@ -14,6 +14,8 @@ BASE = os.environ.get("KAWSAY_URL", "http://127.0.0.1:8000").rstrip("/")
 ADMIN = (os.environ["KAWSAY_ADMIN_EMAIL"], os.environ["KAWSAY_ADMIN_PASSWORD"])
 TEACHER_EMAIL = os.environ.get("KAWSAY_TEACHER_EMAIL", "maestra@demo.pe")
 TEACHER_PW = os.environ.get("KAWSAY_TEACHER_PASSWORD", "")
+DEMO_SCHOOL_CODE = os.environ.get("KAWSAY_DEMO_SCHOOL_CODE", "KAWSAY-DEMO-2026")
+DEMO_FRAMEWORK_NAME = os.environ.get("KAWSAY_DEMO_FRAMEWORK_NAME", "Marco curricular KAWSAY DEMO")
 if os.environ.get("DEMO_ALLOW_WRITES") != "1":
     sys.exit("La demostración crea registros: define DEMO_ALLOW_WRITES=1 explícitamente.")
 if not TEACHER_PW:
@@ -38,19 +40,26 @@ def auth(token):
 
 
 run = uuid.uuid4().hex[:6]
-step("1. Admin crea escuela, docente y marco curricular DEMO")
+step("1. Admin crea o reutiliza escuela, docente y marco curricular DEMO")
 adm = auth(ok(c.post("/auth/login", json={"email": ADMIN[0], "password": ADMIN[1]}))["access_token"])
-school = ok(c.post("/schools", headers=adm, json={"name": f"Escuela DEMO {run}"}), 201)
+schools = ok(c.get("/schools", headers=adm))
+school = next((s for s in schools if s.get("code") == DEMO_SCHOOL_CODE), None)
+if school is None:
+    school = ok(c.post("/schools", headers=adm, json={
+        "name": f"Escuela DEMO {run}", "code": DEMO_SCHOOL_CODE}), 201)
 t_email = TEACHER_EMAIL
 r = c.post("/users", headers=adm, json={"role": "TEACHER", "email": t_email, "password": TEACHER_PW,
                                         "display_name": "Maestra DEMO", "school_id": school["id"]})
 if r.status_code not in (201, 409):   # 409 = ya existe de una ejecución anterior: se reutiliza
     sys.exit(f"FALLO creando docente: {r.status_code} {r.text[:200]}")
-fw = ok(c.post("/curriculum/frameworks", headers=adm, json={
-    "country_code": "PE", "name": f"Marco DEMO {run}", "version_label": "demo", "is_demo": True,
-    "source_note": "Datos de demostración; NO es currículo oficial",
-    "subjects": [{"name": "Matemática (DEMO)", "competencies": [
-        {"name": "Resuelve problemas de cantidad (DEMO)", "capacities": ["Traduce cantidades (DEMO)"]}]}]}), 201)
+frameworks = ok(c.get("/curriculum/frameworks", headers=adm))
+fw = next((f for f in frameworks if f["name"] == DEMO_FRAMEWORK_NAME and f["version_label"] == "demo"), None)
+if fw is None:
+    fw = ok(c.post("/curriculum/frameworks", headers=adm, json={
+        "country_code": "PE", "name": DEMO_FRAMEWORK_NAME, "version_label": "demo", "is_demo": True,
+        "source_note": "Datos de demostración; NO es currículo oficial",
+        "subjects": [{"name": "Matemática (DEMO)", "competencies": [
+            {"name": "Resuelve problemas de cantidad (DEMO)", "capacities": ["Traduce cantidades (DEMO)"]}]}]}), 201)
 tree = ok(c.get(f"/curriculum/frameworks/{fw['id']}", headers=adm))
 subject, comp = tree["subjects"][0], tree["subjects"][0]["competencies"][0]
 print(f"   escuela={school['name']}  marco is_demo={tree['is_demo']}")
@@ -59,7 +68,7 @@ step("2. Docente: planificación por institución (versión 2026.1 → revisión
 tch = auth(ok(c.post("/auth/login", json={"email": t_email, "password": TEACHER_PW}))["access_token"])
 grades = {(g["level"], g["number"]): g["id"] for g in ok(c.get("/curriculum/grades", headers=tch))}
 plan = ok(c.post("/planning/plans", headers=tch, json={"academic_year": 2026, "framework_id": fw["id"],
-                                                       "name": "Plan anual DEMO"}), 201)
+                                                       "name": f"Plan anual DEMO {run}"}), 201)
 vid = plan["version"]["id"]
 period = ok(c.post(f"/planning/versions/{vid}/periods", headers=tch, json={"name": "I Bimestre", "sequence": 1}), 201)
 topics = {}

@@ -32,4 +32,4 @@ Cada control indica la prueba que lo verifica. Estado actual: backend 130 prueba
 - Refresh token del panel en `sessionStorage` (una cookie `httpOnly` sería más segura).
 - App móvil: SQLite local sin cifrar (pendiente SQLCipher) y sin verificar en dispositivo.
 - Sin pruebas de penetración externas, sin análisis de carga, sin revisión legal de datos de menores.
-- Credenciales DEMO fijas en `scripts/dev.py`: solo para uso local; no desplegar con ellas.
+- Credenciales DEMO fijas en `scripts/dev.py` y `render.yaml`: solo para la demo pública con datos ficticios; no usar con datos reales ni reutilizar en producción.

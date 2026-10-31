@@ -22,7 +22,10 @@ El script comprueba archivos y credenciales a través de Git, rechaza posibles s
 2. Conecta el repositorio `alcides18huerto-svg/-KAWSAY-AI`, rama `main`.
 3. Render detectará `render.yaml` y `render.Dockerfile`.
 4. Configura `JWT_SECRET` como secreto nuevo aleatorio, exclusivamente desde Render. No lo incluyas en GitHub.
-5. Revisa logs, estado del build y `/health`, `/admin`, `/docente`, `/estudiante` antes de compartir la URL.
+5. El arranque ejecuta `alembic upgrade head`, crea el administrador DEMO y carga automáticamente el flujo completo (escuela, docente, plan ACTIVO, aula multigrado, estudiantes, tarea, intentos y alerta). Espera a que termine la carga antes de probar el panel.
+6. Revisa logs, estado del build y `/health`, `/admin`, `/docente`, `/estudiante` antes de compartir la URL.
+7. Accesos DEMO: administrador `admin@demo.pe` / `Kawsay-Demo-Local-2026`; docente `maestra@demo.pe` / `Aula-Multigrado-2026!`; estudiantes con **Estudiante → Código y PIN**. Los códigos y PIN aparecen en los logs de Render.
+8. Para desactivar la carga automática, define `KAWSAY_DEMO_SEED=0`.
 
 **Esta configuración es solo para demostraciones con datos ficticios.** Render Free no conserva los datos SQLite almacenados en su disco temporal y el entrenamiento de ML no está validado con estudiantes reales. Para una instalación escolar real hay que usar almacenamiento externo persistente con copias de seguridad y cumplir controles de protección de datos.
 

@@ -8,11 +8,13 @@ Ver `docs/GUIA_VSCODE.md`. Resumen: `python scripts/dev.py setup` → `python sc
 Panel en `http://127.0.0.1:8080` (nginx con CSP, proxy `/api` al backend). `--profile automation` añade el despachador de eventos.
 
 ## Render (Docker, listo para demo)
-1. Sube el repositorio a GitHub y en Render crea un **Web Service** con runtime **Docker**, `dockerfilePath=./render.Dockerfile` y `dockerContext=.`.
+1. Sube el repositorio a GitHub y en Render crea un **Web Service** con runtime **Docker**, `dockerfilePath=./render.Dockerfile` y `dockerContext=.` (o usa el Blueprint `render.yaml`).
 2. Define `JWT_SECRET` como secreto (32+ caracteres) y `APP_ENV=production`; `AI_PROVIDER=local` no necesita claves.
-3. `render.yaml` ya declara `healthCheckPath=/health`, `DATABASE_URL=sqlite:////srv/data/kawsay.db` y `CORS_ORIGINS` vacío (mismo origen).
-4. El contenedor escucha en `$PORT` (Render lo inyecta; por defecto 10000) y ejecuta `alembic upgrade head` antes de Uvicorn.
-5. **Limitación de Render Free:** el disco es efímero; la base SQLite se pierde en cada redeploy. Para datos reales usa un disco persistente o PostgreSQL (ADR-010).
+3. `render.yaml` ya declara `healthCheckPath=/health`, `DATABASE_URL=sqlite:////srv/data/kawsay.db`, `CORS_ORIGINS` vacío (mismo origen) y las variables DEMO.
+4. El contenedor escucha en `$PORT` (Render lo inyecta; por defecto 10000), ejecuta `alembic upgrade head`, crea el administrador DEMO y, cuando `/ready` responde, carga el flujo completo con `scripts/demo_e2e.py`: escuela, docente, marco curricular, plan ACTIVO, aula multigrado, estudiantes, tarea publicada, intentos y alerta.
+5. Accesos DEMO: administrador `admin@demo.pe` / `Kawsay-Demo-Local-2026`; docente `maestra@demo.pe` / `Aula-Multigrado-2026!`; estudiantes con la pestaña **Estudiante → Código y PIN**. Los códigos y PIN se imprimen en los logs de Render en cada arranque.
+6. Para arrancar sin cargar datos, define `KAWSAY_DEMO_SEED=0`.
+7. **Limitación de Render Free:** el disco es efímero; la base SQLite se pierde en cada redeploy. Para datos reales usa un disco persistente o PostgreSQL (ADR-010).
 
 ## Producción (propuesta mínima para un piloto)
 1. Un solo servidor (SQLite: **un único proceso de backend**, sin réplicas) detrás de un proxy con HTTPS.
