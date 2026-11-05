@@ -16,6 +16,8 @@ TEACHER_EMAIL = os.environ.get("KAWSAY_TEACHER_EMAIL", "maestra@demo.pe")
 TEACHER_PW = os.environ.get("KAWSAY_TEACHER_PASSWORD", "")
 DEMO_SCHOOL_CODE = os.environ.get("KAWSAY_DEMO_SCHOOL_CODE", "KAWSAY-DEMO-2026")
 DEMO_FRAMEWORK_NAME = os.environ.get("KAWSAY_DEMO_FRAMEWORK_NAME", "Marco curricular KAWSAY DEMO")
+DEMO_STUDENT_EMAIL = os.environ.get("KAWSAY_DEMO_STUDENT_EMAIL", "estudiante@demo.pe")
+DEMO_STUDENT_PASSWORD = os.environ.get("KAWSAY_DEMO_STUDENT_PASSWORD", "Kawsay-Aula-2026!")
 if os.environ.get("DEMO_ALLOW_WRITES") != "1":
     sys.exit("La demostración crea registros: define DEMO_ALLOW_WRITES=1 explícitamente.")
 if not TEACHER_PW:
@@ -92,6 +94,14 @@ print("   grados presentes:", ok(c.get(f"/classrooms/{room['id']}", headers=tch)
 print("   accesos de estudiantes (pestaña Estudiante del login):")
 for n, k in kids.items():
     print(f"     {n}: código {k['login_code']} · PIN {k['pin']}")
+
+# Estudiante fijo para el botón "Acceso rápido DEMO" del login (correo + contraseña).
+r = c.post("/students", headers=tch, json={
+    "display_name": "Estudiante DEMO", "grade_id": grades[("PRIMARIA", 1)], "classroom_id": room["id"],
+    "email": DEMO_STUDENT_EMAIL, "password": DEMO_STUDENT_PASSWORD})
+if r.status_code not in (201, 409):   # 409 = ya existe de una ejecución anterior: se reutiliza
+    sys.exit(f"FALLO creando estudiante DEMO: {r.status_code} {r.text[:200]}")
+print(f"   acceso directo DEMO: {DEMO_STUDENT_EMAIL} · {DEMO_STUDENT_PASSWORD}")
 
 step("4. Actividad base → 3 variantes (una por grado) → revisión docente → aprobación → publicación")
 a = ok(c.post("/assignments", headers=tch, json={

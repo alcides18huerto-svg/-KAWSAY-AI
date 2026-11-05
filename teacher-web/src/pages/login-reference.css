@@ -351,3 +351,74 @@
 @media(prefers-reduced-motion:reduce){
   .login-reimagined .login-role-tabs button,.login-reimagined .login-input-wrap{transition:none;}
 }
+
+/* Acceso rápido de demostración: un clic por módulo principal. */
+.login-reimagined .login-demo {
+  flex:0 0 auto;
+  margin:2px 0 0;
+  padding:13px 0 0;
+  border-top:1px solid #27475b;
+  width:100%;
+}
+.login-reimagined .login-demo-label {
+  margin:0 0 8px;
+  text-align:center;
+  font-size:9.5px;
+  font-weight:850;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:#7fe4cd;
+}
+.login-reimagined .login-demo-grid {
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+}
+.login-reimagined .login-demo-option {
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  min-width:0;
+  padding:8px 3px 9px;
+  border-radius:10px;
+  border:1px solid #2c5a6b;
+  background:#0a2a3d;
+  color:#d9edf5;
+  font-size:10px;
+  font-weight:800;
+  line-height:1.15;
+  text-align:center;
+  cursor:pointer;
+  transition:background .16s ease,border-color .16s ease,color .16s ease,transform .16s ease;
+}
+.login-reimagined .login-demo-option:hover:not(:disabled) {
+  background:#134458;
+  border-color:#38c9ad;
+  color:#fff;
+  transform:translateY(-1px);
+}
+.login-reimagined .login-demo-option:active:not(:disabled) {transform:translateY(0);}
+.login-reimagined .login-demo-option:disabled {opacity:.62;cursor:progress;}
+.login-reimagined .login-demo-option .icon {width:18px;height:18px;color:#26e5bb;}
+.login-reimagined .login-demo-option small {
+  display:block;
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:#8fb6c6;
+}
+.login-reimagined .login-demo-note {
+  margin:8px 0 0;
+  text-align:center;
+  font-size:9px;
+  line-height:1.4;
+  color:#9ebacb;
+}
+@media(max-width:400px){
+  .login-reimagined .login-demo-option {font-size:9px;padding:7px 2px 8px;gap:2px;}
+  .login-reimagined .login-demo-option .icon {width:16px;height:16px;}
+  .login-reimagined .login-demo-note {font-size:8.5px;}
+}
