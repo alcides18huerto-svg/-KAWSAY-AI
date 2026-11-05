@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#102b40"><title>KAWSAY AI · Comunidad educativa</title>
+  <link rel="stylesheet" href="assets/css/style.css"><link rel="stylesheet" href="assets/css/roles.css"><link rel="stylesheet" href="assets/css/visual.css"><link rel="stylesheet" href="assets/css/hackathon.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">✳</div><div><strong>KAWSAY <span>AI</span></strong><small>EDUCACIÓN QUE FLORECE</small></div></div>
+    <div class="workspace"><span class="workspace-icon">⌂</span><div><b>Comunidad educativa</b><small>Entorno de demostración</small></div><span>✦</span></div>
+    <div class="nav-label">ELIGE UN PERFIL</div>
+    <nav id="nav" aria-label="Perfiles de la demostración"></nav>
+    <div class="sidebar-bottom"><div class="side-note"><span>✦</span><div><b>Cada paso cuenta</b><small>Aprendemos y crecemos en comunidad.</small></div></div><div class="profile"><div class="avatar">KA</div><div><b>KAWSAY AI</b><small>Simulación local</small></div></div></div>
+  </aside>
+  <main class="main"><header class="topbar"><button class="mobile-menu" onclick="document.body.classList.toggle('menu-open')" aria-label="Abrir menú de perfiles">☰</button><div class="breadcrumb">KAWSAY AI <span>/</span> <b id="breadcrumb">Administrador</b></div><div class="top-actions"><button class="connection-control" id="connection-control" onclick="Hack.toggleConnection()" title="Cambiar conectividad simulada">● En línea</button><label class="language-control"><span>Idioma</span><select id="global-language" onchange="Hack.changeLanguage(this.value)" aria-label="Idioma de la interfaz"><option value="es">Español</option><option value="qu">Quechua · ejemplo</option><option value="ay">Aimara · ejemplo</option></select></label><span class="top-identity"><span id="top-role">Administrador</span><span class="avatar small">K</span></span><span id="alert-dot" hidden></span></div></header>
+    <div class="simulation-disclaimer">SIMULACIÓN DEMOSTRATIVA: datos ficticios, procesamiento local y modelos no conectados. No representa una plataforma productiva.</div>
+    <div id="app"></div>
+  </main>
+  <div id="toast" role="status"></div>
+  <script src="assets/js/data.js"></script><script src="assets/js/core.js"></script>
+  <script src="modules/admin/admin.js"></script><script src="modules/docente/docente.js"></script><script src="modules/estudiante/estudiante.js"></script><script src="modules/machine-learning/ml.js"></script><script src="modules/adaptacion/adaptacion.js"></script><script src="modules/tutor-ia/tutor.js"></script><script src="modules/automatizacion/automatizacion.js"></script><script src="modules/offline/offline.js"></script><script src="modules/evaluaciones/evaluaciones.js"></script><script src="assets/js/app.js"></script><script src="assets/js/banco-ampliado.js"></script><script src="assets/js/integracion.js"></script><script src="assets/js/roles.js"></script><script src="assets/js/hackathon.js"></script>
+</body></html>

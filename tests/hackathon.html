@@ -1,0 +1,56 @@
+<!doctype html><meta charset="utf-8"><title>Prueba integral de hackatón</title>
+<pre id="result">PENDIENTE</pre><iframe id="sim" src="../index.html" hidden></iframe>
+<script>
+document.getElementById('sim').onload=async function(){
+  const w=this.contentWindow,out=document.getElementById('result'),errors=[];
+  w.addEventListener('error',e=>errors.push(e.error?.stack||e.message));
+  try{
+    w.eval(`
+      Store.reset();Student.active=null;Student.last=null;Roles.open('teacher','work');
+      const f=document.getElementById('activityForm');
+      f.elements.title.value='Fracciones de la comunidad';f.elements.topic.value='Fracciones';f.elements.grade.value='5';
+      f.requestSubmit();
+      const a=S().activities.find(x=>x.title==='Fracciones de la comunidad');
+      if(!a||a.competence!=='Resuelve problemas de cantidad')throw Error('Actividad curricular no creada');
+      Teacher.assign(a.id);document.getElementById('assignStudent').value='1';Hack.previewAssignment();
+      if(!document.getElementById('assignment-preview').textContent.includes('fracciones'))throw Error('No aparece la revisión curricular');
+      document.querySelector('.role-modal form').requestSubmit();
+      if(!a.assigned.includes(1))throw Error('Asignación no publicada');
+      Roles.open('student','activities');Student.start(a.id);
+      const d=S().learningDraft;if(!d.items.length||d.items.some(q=>!Curriculum.questions(a,5).some(x=>x.id===q.id)))throw Error('Contenido mezclado');
+      const form=document.getElementById('singleQuiz'),radio=form.querySelector('input[type=radio]');
+      if(radio){const wrong=[...form.querySelectorAll('input')].find(x=>!checkAnswer(x.value,d.items[0].answer));wrong.checked=true}else form.querySelector('input').value='respuesta incorrecta';
+      S().online=false;form.requestSubmit();
+      if(!S().liveSignal?.risk||!S().proposals?.length||!S().alerts.some(x=>x.reason.includes('Señal temprana')))throw Error('No se activó la intervención inmediata');
+      if(!Tutor.answer('mi error').includes(d.items[0].question))throw Error('Tutor sin contexto');
+      const p=S().proposals[0];if(S().activities.some(x=>x.source===a.id))throw Error('Publicación sin aprobación');
+      Roles.open('teacher','proposals');Hack.approve(p.id);
+      const adapted=S().activities.find(x=>x.id===p.published);
+      if(p.status!=='aprobada'||!adapted.assigned.includes(1)||adapted.topic!=='Fracciones')throw Error('Aprobación o adaptación incorrecta');
+      if(!adapted.questionIds.every(id=>Curriculum.questions(a,5).some(q=>q.id===id)))throw Error('El refuerzo cambió el contenido');
+      const rejected={id:uid(),student:1,source:a.id,area:a.area,topic:'Fracciones',competence:a.competence,questionIds:adapted.questionIds,status:'pendiente',reason:'Prueba'};Hack.proposals().push(rejected);const before=S().activities.length;Hack.reject(rejected.id);if(rejected.status!=='rechazada'||S().activities.length!==before)throw Error('El rechazo publicó una actividad');
+      Hack.changeLanguage('qu');if(!document.getElementById('nav').textContent.includes('Yachaq'))throw Error('Idioma no actualizado');
+      Hack.changeLanguage('es');
+      if(!S().queue.some(x=>x.status==='Pendiente'))throw Error('No se guardó la respuesta offline');
+      Hack.toggleConnection();
+    `);
+    await new Promise(resolve=>setTimeout(resolve,1000));
+    w.eval(`if(S().queue.some(x=>x.status==='Pendiente'))throw Error('No se sincronizó la cola');
+      if(Curriculum.questions({area:'Matemáticas',topic:'Fracciones',title:'Fracciones'},1).length)throw Error('Se mezcló un contenido no disponible');
+      Hack.changeLanguage('ay');if(!document.getElementById('nav').textContent.includes('Yatiqiri'))throw Error('Aimara no actualizado');Hack.changeLanguage('es');
+      Presentation.reset();Roles.open('admin','jury');for(let i=0;i<12;i++)Presentation.next();
+      if(S().presentation.step!==12||S().presentation.status!=='completada')throw Error('Demostración incompleta');
+      if(!S().stream.some(x=>x.type==='analisis')||!S().stream.some(x=>x.type==='automatizacion'))throw Error('Eventos no registrados');
+      Roles.open('admin','home');if(!document.getElementById('app').textContent.includes('Indicadores educativos'))throw Error('Administrador no actualizado');
+      Presentation.reset();Roles.open('admin','jury');Presentation.play();`);
+    await new Promise(resolve=>setTimeout(resolve,1500));
+    w.eval(`Presentation.pause();if(S().presentation.step<1)throw Error('No avanzó el temporizador');window.pausedStep=S().presentation.step;`);
+    await new Promise(resolve=>setTimeout(resolve,1500));
+    w.eval(`if(S().presentation.step!==window.pausedStep)throw Error('La pausa no detuvo la demostración');Presentation.play();`);
+    await new Promise(resolve=>setTimeout(resolve,16500));
+    w.eval(`if(S().presentation.status!=='completada'||S().presentation.step!==12)throw Error('La continuación no terminó la demostración');`);
+    if(errors.length)throw Error(errors.join(' | '));
+    out.textContent='OK: currículo, respuesta, análisis, tutor, aprobación, idioma, offline, sincronización y demostración';
+  }catch(e){out.textContent='ERROR: '+e.stack+' / '+errors.join(' | ')}
+};
+</script>

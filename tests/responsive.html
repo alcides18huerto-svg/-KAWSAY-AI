@@ -1,0 +1,17 @@
+<!doctype html><meta charset="utf-8"><title>Prueba responsive</title>
+<pre id="result">PENDIENTE</pre><iframe id="sim" src="../index.html" style="width:390px;height:760px;border:0"></iframe>
+<script>
+document.getElementById('sim').onload=function(){
+  const w=this.contentWindow,result=document.getElementById('result');
+  try{
+    w.eval(`
+      for(const [role,view] of [['admin','home'],['admin','manage'],['admin','jury'],['teacher','home'],['teacher','work'],['teacher','proposals'],['teacher','flow'],['student','home'],['student','activities']]){
+        Roles.open(role,view);
+        const root=document.documentElement;
+        if(root.scrollWidth>root.clientWidth+1)throw Error(role+'/'+view+': desbordamiento '+root.scrollWidth+'/'+root.clientWidth);
+      }
+    `);
+    result.textContent='OK: nueve vistas sin desbordamiento horizontal a 390px';
+  }catch(e){result.textContent='ERROR: '+e.stack}
+};
+</script>

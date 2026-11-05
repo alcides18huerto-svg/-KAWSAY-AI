@@ -1,0 +1,44 @@
+<!doctype html><meta charset="utf-8"><title>Prueba de actividades</title>
+<pre id="result">PENDIENTE</pre><iframe id="sim" src="../index.html" hidden></iframe>
+<script>
+document.getElementById('sim').onload=function(){
+  const w=this.contentWindow, result=document.getElementById('result');
+  let errors=[];w.addEventListener('error',e=>errors.push(e.error?.stack||e.message));
+  try{
+    w.eval(`
+      Store.reset(); Student.active=null; Student.last=null;
+      Roles.open('teacher','work');
+      const f=document.getElementById('activityForm');
+      f.elements.title.value='Práctica de prueba';
+      f.elements.topic.value='Operaciones';
+      if(!f.checkValidity())throw Error('Formulario inválido: '+Array.from(f.elements).filter(x=>!x.checkValidity()).map(x=>x.name+'='+x.value+': '+x.validationMessage).join('; '));
+      f.requestSubmit();
+      if(!S().activities.some(a=>a.title==='Práctica de prueba'))throw Error('No se guardó la actividad');
+      const activity=S().activities.find(a=>a.title==='Práctica de prueba');
+      Teacher.edit=activity.id;App.render();
+      const editForm=document.getElementById('activityForm');
+      editForm.elements.title.value='Práctica editada';editForm.requestSubmit();
+      if(activity.title!=='Práctica editada')throw Error('No se guardó la edición');
+      Teacher.assign(activity.id);
+      document.getElementById('assignStudent').value='1';
+      document.querySelector('.role-modal form').requestSubmit();
+      if(!activity.assigned.includes(1))throw Error('No se asignó la actividad');
+      Roles.open('student','activities');
+      if(!document.getElementById('app').textContent.includes('Práctica editada'))throw Error('Actividad no visible');
+      Student.start(activity.id);
+      if(!document.getElementById('singleQuiz'))throw Error('No se abrió el ejercicio');
+      for(let i=0;i<5;i++){
+        const d=S().learningDraft;
+        const input=document.querySelector('#singleQuiz input');
+        if(input.type==='radio'){document.querySelector('#singleQuiz input[value="'+CSS.escape(d.items[i].answer)+'"]').checked=true}
+        else input.value=d.items[i].answer;
+        document.getElementById('singleQuiz').requestSubmit();
+        if(!d.checked[i])throw Error('No se registró la respuesta '+i);
+        Student.nextQuestion();
+      }
+      if(S().results[0].score!==100)throw Error('Evaluación incorrecta');
+    `);
+    result.textContent='OK: actividad creada, editada, asignada, abierta y completada en navegador';
+  }catch(e){result.textContent='ERROR: '+e.stack+' / '+errors.join(' | ')}
+};
+</script>
