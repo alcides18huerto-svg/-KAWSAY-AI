@@ -4,6 +4,8 @@ WORKDIR /web
 COPY teacher-web/package*.json ./
 RUN npm ci --no-audit --no-fund
 COPY teacher-web/ ./
+# Simulador estático sin backend (opción Demo del login). Vite lo copia a dist/demo.
+COPY index.html assets modules ./demo-src/
 RUN npm run build
 
 FROM python:3.12-slim

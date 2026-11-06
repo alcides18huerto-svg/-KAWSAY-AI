@@ -201,6 +201,9 @@ export function Login() {
             ))}
           </div>
           <p className="login-demo-note">Entra a los tres módulos sin escribir credenciales. Datos ficticios.</p>
+          <a className="login-demo-full" href="/demo/index.html">
+            <Icon name="spark"/> Abrir demo completa sin servidor
+          </a>
         </div>
 
         <p className="login-help">¿Necesitas acceso? Contacta a la administración de tu institución.</p>

@@ -84,6 +84,9 @@ def create_app() -> FastAPI:
             raise RuntimeError(f"Falta frontend compilado: {index}")
         if (dist / "assets").is_dir():
             app.mount("/assets", StaticFiles(directory=dist / "assets"), name="web_assets")
+        # Simulador estático sin backend, incluido como opción "Demo" en el login.
+        if (dist / "demo").is_dir():
+            app.mount("/demo", StaticFiles(directory=dist / "demo", html=True), name="web_demo")
 
         @app.get("/{requested_path:path}", include_in_schema=False)
         def serve_web(requested_path: str):
