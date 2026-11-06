@@ -4,8 +4,10 @@ WORKDIR /web
 COPY teacher-web/package*.json ./
 RUN npm ci --no-audit --no-fund
 COPY teacher-web/ ./
-# Simulador estático sin backend (opción Demo del login). Vite lo copia a dist/demo.
-COPY index.html assets modules ./demo-src/
+# Simulador estático sin backend (opción Demo del login).
+COPY index.html ./demo-src/index.html
+COPY assets ./demo-src/assets
+COPY modules ./demo-src/modules
 RUN npm run build
 
 FROM python:3.12-slim
@@ -17,8 +19,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ ./
 COPY scripts/demo_e2e.py ./scripts/demo_e2e.py
 COPY --from=web-build /web/dist/ /srv/web-dist/
-# Copiar el simulador directamente al artefacto final, aunque falle el plugin de Vite.
+# Copia explícita para no depender de cómo Vite empaque archivos estáticos.
 COPY --from=web-build /web/demo-src/ /srv/web-dist/demo/
+RUN test -f /srv/web-dist/demo/index.html \
+    && test -f /srv/web-dist/demo/assets/js/roles.js \
+    && test -f /srv/web-dist/demo/modules/admin/admin.js
 RUN mkdir -p /srv/data && chown -R kawsay:kawsay /srv
 USER kawsay
 ENV KAWSAY_SERVE_WEB_DIR=/srv/web-dist
