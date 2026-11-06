@@ -17,6 +17,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY backend/ ./
 COPY scripts/demo_e2e.py ./scripts/demo_e2e.py
 COPY --from=web-build /web/dist/ /srv/web-dist/
+# Copiar el simulador directamente al artefacto final, aunque falle el plugin de Vite.
+COPY --from=web-build /web/demo-src/ /srv/web-dist/demo/
 RUN mkdir -p /srv/data && chown -R kawsay:kawsay /srv
 USER kawsay
 ENV KAWSAY_SERVE_WEB_DIR=/srv/web-dist
