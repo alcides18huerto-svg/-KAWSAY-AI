@@ -50,9 +50,17 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
             # Conservar la CSP específica del HTML de React: el valor genérico
             # default-src 'none' impedía cargar JavaScript, CSS y la interfaz.
             # Las respuestas API siguen usando la CSP restrictiva por defecto.
-            if (not request.url.path.startswith(("/docs", "/openapi"))
-                    and "content-security-policy" not in response.headers):
-                response.headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'"
+            if "content-security-policy" not in response.headers:
+                if request.url.path.startswith("/demo"):
+                    # Simulador estático: usa onclick inline y recursos del mismo origen.
+                    response.headers["Content-Security-Policy"] = (
+                        "default-src 'self'; script-src 'self' 'unsafe-inline'; "
+                        "style-src 'self' 'unsafe-inline'; img-src 'self' data:; "
+                        "font-src 'self' data:; connect-src 'self'; object-src 'none'; "
+                        "base-uri 'self'; form-action 'self'; frame-ancestors 'none'"
+                    )
+                elif not request.url.path.startswith(("/docs", "/openapi")):
+                    response.headers["Content-Security-Policy"] = "default-src 'none'; frame-ancestors 'none'"
             if get_settings().is_production:
                 response.headers["Strict-Transport-Security"] = "max-age=63072000; includeSubDomains"
             elapsed = round((time.perf_counter() - start) * 1000, 1)
