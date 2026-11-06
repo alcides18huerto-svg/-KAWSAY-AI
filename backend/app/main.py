@@ -1,3 +1,4 @@
+import logging
 import os
 from contextlib import asynccontextmanager
 from pathlib import Path
@@ -42,7 +43,14 @@ def create_app() -> FastAPI:
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
-        startup()
+        try:
+            startup()
+        except Exception:
+            # La demo estática y el login deben seguir disponibles aunque falle
+            # SQLite, una migración o la carga de datos DEMO.
+            logging.getLogger("kawsay.startup").exception(
+                "Arranque incompleto: la API puede fallar, pero / y /demo siguen disponibles."
+            )
         yield
 
     app = FastAPI(

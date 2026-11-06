@@ -8,12 +8,8 @@ import { Brand, Icon } from "../components/Icon";
 type LoginRole = "ADMIN" | "TEACHER" | "STUDENT";
 const REMEMBER_EMAIL_KEY = "kawsay_last_email";
 
-// Cuentas públicas de la DEMOSTRACIÓN. No usar en una instalación con datos reales.
-const DEMO_ACCOUNTS: Record<LoginRole, { email: string; password: string; label: string }> = {
-  ADMIN: { email: "admin@demo.pe", password: "Kawsay-Demo-Local-2026", label: "administrador" },
-  TEACHER: { email: "maestra@demo.pe", password: "Aula-Multigrado-2026!", label: "docente" },
-  STUDENT: { email: "estudiante@demo.pe", password: "Kawsay-Aula-2026!", label: "estudiante" },
-};
+// Acceso directo al simulador local (no requiere backend ni SQLite).
+const DEMO_PATHS: Record<LoginRole, string> = { ADMIN: "admin", TEACHER: "teacher", STUDENT: "student" };
 
 function storedEmail(): string {
   try { return localStorage.getItem(REMEMBER_EMAIL_KEY) ?? ""; } catch { return ""; }
@@ -32,14 +28,12 @@ export function Login() {
   const [helpOpen, setHelpOpen] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
-  const [demoBusy, setDemoBusy] = useState<LoginRole | null>(null);
   const [showPassword, setShowPassword] = useState(false);
   const student = role === "STUDENT";
   const codeMode = student && studentMethod === "code";
-  const anyBusy = busy || demoBusy !== null;
 
   const chooseRole = (next: LoginRole) => {
-    if (anyBusy) return;
+    if (busy) return;
     setRole(next);
     setErr(null);
     setPassword("");
@@ -47,20 +41,9 @@ export function Login() {
     setHelpOpen(false);
   };
 
-  const enterDemo = async (kind: LoginRole) => {
-    if (anyBusy) return;
-    setDemoBusy(kind); setErr(null);
-    try {
-      const account = DEMO_ACCOUNTS[kind];
-      if (kind === "STUDENT") {
-        await loginStudentEmail(account.email, account.password);
-        nav("/estudiante", { replace: true });
-      } else {
-        await login(account.email, account.password);
-        nav("/", { replace: true });
-      }
-    } catch (reason) { setErr(errMsg(reason)); }
-    finally { setDemoBusy(null); }
+  const enterDemo = (kind: LoginRole) => {
+    // El simulador estático funciona aunque SQLite/migraciones fallen.
+    window.location.assign(`/demo/index.html?perfil=${DEMO_PATHS[kind]}`);
   };
 
   const submit = async (e: FormEvent) => {
@@ -119,7 +102,7 @@ export function Login() {
           {(["ADMIN", "TEACHER", "STUDENT"] as const).map((kind) =>
             <button type="button" key={kind} onClick={() => chooseRole(kind)}
               className={role === kind ? "active" : ""}
-              aria-pressed={role === kind} disabled={anyBusy}>
+              aria-pressed={role === kind} disabled={busy}>
               {kind === "ADMIN" ? "Administrador" : kind === "TEACHER" ? "Docente" : "Estudiante"}
             </button>
           )}
@@ -127,12 +110,12 @@ export function Login() {
 
         <div className="student-login-method" role="group" aria-label="Método de acceso">
           <button type="button" className={!codeMode ? "active" : ""}
-            aria-pressed={!codeMode} disabled={anyBusy}
+            aria-pressed={!codeMode} disabled={busy}
             onClick={() => { setStudentMethod("email"); setErr(null); setPassword(""); }}>
             Correo y contraseña
           </button>
           <button type="button" className={codeMode ? "active" : ""}
-            aria-pressed={codeMode} disabled={anyBusy}
+            aria-pressed={codeMode} disabled={busy}
             onClick={() => { if (!student) chooseRole("STUDENT"); setStudentMethod("code"); setErr(null); setPassword(""); }}>
             Código y PIN
           </button>
@@ -182,7 +165,7 @@ export function Login() {
             {" "}Este formulario no envía correos automáticos.
           </p>}
           <ErrorBox message={err}/>
-          <button type="submit" className="login-submit" disabled={anyBusy}>
+          <button type="submit" className="login-submit" disabled={busy}>
             {busy ? "Ingresando…" : "Ingresar"} <Icon name="arrow"/>
           </button>
         </form>
@@ -192,15 +175,15 @@ export function Login() {
           <div className="login-demo-grid">
             {(["ADMIN", "TEACHER", "STUDENT"] as const).map((kind) => (
               <button type="button" key={kind} className="login-demo-option"
-                aria-label={`Entrar como ${DEMO_ACCOUNTS[kind].label} con la cuenta de demostración`}
-                onClick={() => void enterDemo(kind)} disabled={anyBusy}>
+                aria-label={`Abrir el simulador como ${kind === "ADMIN" ? "administrador" : kind === "TEACHER" ? "docente" : "estudiante"}`}
+                onClick={() => enterDemo(kind)} disabled={busy}>
                 <Icon name={kind === "ADMIN" ? "shield" : kind === "TEACHER" ? "graduation" : "students"}/>
                 <span aria-hidden="true">{kind === "ADMIN" ? "Administrador" : kind === "TEACHER" ? "Docente" : "Estudiante"}</span>
-                <small aria-hidden="true">{demoBusy === kind ? "Entrando…" : "Demo"}</small>
+                <small aria-hidden="true">Demo</small>
               </button>
             ))}
           </div>
-          <p className="login-demo-note">Entra a los tres módulos sin escribir credenciales. Datos ficticios.</p>
+          <p className="login-demo-note">Abre el simulador local al instante, sin servidor ni credenciales. Datos ficticios.</p>
           <a className="login-demo-full" href="/demo/index.html">
             <Icon name="spark"/> Abrir demo completa sin servidor
           </a>

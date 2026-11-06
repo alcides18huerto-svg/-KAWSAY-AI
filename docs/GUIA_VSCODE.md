@@ -23,8 +23,9 @@ Para: **Max**. Tiempo: ~5 minutos. No necesitas instalar ninguna base de datos (
    python scripts/dev.py web        # http://localhost:5173
    ```
 4. Entra en `http://localhost:5173`. El login ofrece **Acceso rápido DEMO** con un botón por módulo
-   (Administrador, Docente y Estudiante) que inicia sesión sin escribir credenciales.
-   También puedes usar el formulario:
+   (Administrador, Docente y Estudiante) que abre el simulador estático local
+   (`/demo/index.html?perfil=admin|teacher|student`) sin backend ni credenciales.
+   Para entrar al panel React completo, usa el formulario:
    - Docente: `maestra@demo.pe` / `Aula-Multigrado-2026!`
    - Administrador: `admin@demo.pe` / `Kawsay-Demo-Local-2026`
    - Estudiante: `estudiante@demo.pe` / `Kawsay-Aula-2026!`, o la pestaña **Estudiante → Código y PIN**.

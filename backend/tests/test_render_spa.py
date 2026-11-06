@@ -74,3 +74,23 @@ def test_render_static_missing_build_fails_early(monkeypatch, tmp_path):
         assert "Falta frontend compilado" in str(exc)
     else:
         raise AssertionError("Debería fallar si React todavía no se compiló")
+
+
+def test_static_demo_survives_startup_database_failure(monkeypatch, tmp_path):
+    from app import main
+
+    demo = tmp_path / "demo"
+    demo.mkdir()
+    (demo / "index.html").write_text("<html>Simulador KAWSAY</html>", encoding="utf-8")
+    (tmp_path / "index.html").write_text("<html>Login KAWSAY</html>", encoding="utf-8")
+    monkeypatch.setenv("KAWSAY_SERVE_WEB_DIR", str(tmp_path))
+
+    def fail_startup():
+        raise RuntimeError("SQLite unavailable")
+
+    monkeypatch.setattr(main, "startup", fail_startup)
+    with TestClient(create_app()) as client:
+        response = client.get("/demo/index.html?perfil=student")
+        assert response.status_code == 200
+        assert "Simulador KAWSAY" in response.text
+        assert "script-src 'self' 'unsafe-inline'" in response.headers["content-security-policy"]

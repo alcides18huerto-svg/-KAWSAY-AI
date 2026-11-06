@@ -75,3 +75,8 @@ App.go=function(page){if(page==='admin'||page==='teacher'||page==='student')retu
 App.render=function(){Roles.render()};
 App.reset=function(){Roles.reset()};
 Roles.render();
+
+// Acceso directo desde el login: /demo/index.html?perfil=admin|teacher|student
+const requestedRole=new URLSearchParams(location.search).get('perfil')?.toLowerCase();
+const roleAliases={admin:'admin',administrador:'admin',teacher:'teacher',docente:'teacher',student:'student',estudiante:'student'};
+if(requestedRole&&Object.prototype.hasOwnProperty.call(roleAliases,requestedRole))Roles.open(roleAliases[requestedRole]);

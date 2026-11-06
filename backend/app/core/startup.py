@@ -11,15 +11,15 @@ import httpx
 from alembic import command
 from alembic.config import Config
 
-from app.core.config import get_settings
 from app.demo_bootstrap import bootstrap_administrator, bootstrap_teacher
 
 logger = logging.getLogger("kawsay.startup")
 
 
 def _auto_migrate_enabled() -> bool:
-    default = "1" if get_settings().is_production else "0"
-    return os.getenv("KAWSAY_AUTO_MIGRATE", default) == "1"
+    # En esta demo migramos por defecto en cualquier entorno: así nunca queda una
+    # base sin tablas ("no such table") si falta la variable de entorno.
+    return os.getenv("KAWSAY_AUTO_MIGRATE", "1") == "1"
 
 
 def run_migrations() -> None:
